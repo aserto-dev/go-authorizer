@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -44,7 +45,7 @@ func All() error {
 
 // Builds the aserto proto image
 func BuildDev() error {
-	return mage.RunDir(getProtoRepo(), mage.AddArg("build"))
+	return mage.RunDirs(path.Join(getProtoRepo(), "magefiles"), getProtoRepo(), mage.AddArg("build"))
 }
 
 // Generates from a dev build.

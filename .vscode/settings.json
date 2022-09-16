@@ -1,8 +1,5 @@
 {
     "cSpell.words": [
         "Aserto"
-    ],
-    "gopls": {
-        "build.buildFlags": ["-tags=wireinject,mage"],
-      }
+    ]
 }
