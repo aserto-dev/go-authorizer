@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthorizerClient interface {
 	DecisionTree(ctx context.Context, in *DecisionTreeRequest, opts ...grpc.CallOption) (*DecisionTreeResponse, error)
 	Is(ctx context.Context, in *IsRequest, opts ...grpc.CallOption) (*IsResponse, error)
+	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
+	Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (*CompileResponse, error)
 }
 
 type authorizerClient struct {
@@ -52,12 +54,32 @@ func (c *authorizerClient) Is(ctx context.Context, in *IsRequest, opts ...grpc.C
 	return out, nil
 }
 
+func (c *authorizerClient) Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error) {
+	out := new(QueryResponse)
+	err := c.cc.Invoke(ctx, "/aserto.authorizer.v2.Authorizer/Query", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizerClient) Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (*CompileResponse, error) {
+	out := new(CompileResponse)
+	err := c.cc.Invoke(ctx, "/aserto.authorizer.v2.Authorizer/Compile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthorizerServer is the server API for Authorizer service.
 // All implementations should embed UnimplementedAuthorizerServer
 // for forward compatibility
 type AuthorizerServer interface {
 	DecisionTree(context.Context, *DecisionTreeRequest) (*DecisionTreeResponse, error)
 	Is(context.Context, *IsRequest) (*IsResponse, error)
+	Query(context.Context, *QueryRequest) (*QueryResponse, error)
+	Compile(context.Context, *CompileRequest) (*CompileResponse, error)
 }
 
 // UnimplementedAuthorizerServer should be embedded to have forward compatible implementations.
@@ -69,6 +91,12 @@ func (UnimplementedAuthorizerServer) DecisionTree(context.Context, *DecisionTree
 }
 func (UnimplementedAuthorizerServer) Is(context.Context, *IsRequest) (*IsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Is not implemented")
+}
+func (UnimplementedAuthorizerServer) Query(context.Context, *QueryRequest) (*QueryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Query not implemented")
+}
+func (UnimplementedAuthorizerServer) Compile(context.Context, *CompileRequest) (*CompileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Compile not implemented")
 }
 
 // UnsafeAuthorizerServer may be embedded to opt out of forward compatibility for this service.
@@ -118,6 +146,42 @@ func _Authorizer_Is_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authorizer_Query_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizerServer).Query(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aserto.authorizer.v2.Authorizer/Query",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizerServer).Query(ctx, req.(*QueryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Authorizer_Compile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizerServer).Compile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aserto.authorizer.v2.Authorizer/Compile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizerServer).Compile(ctx, req.(*CompileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authorizer_ServiceDesc is the grpc.ServiceDesc for Authorizer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -132,6 +196,14 @@ var Authorizer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Is",
 			Handler:    _Authorizer_Is_Handler,
+		},
+		{
+			MethodName: "Query",
+			Handler:    _Authorizer_Query_Handler,
+		},
+		{
+			MethodName: "Compile",
+			Handler:    _Authorizer_Compile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
