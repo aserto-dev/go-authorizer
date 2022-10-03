@@ -26,6 +26,8 @@ type AuthorizerClient interface {
 	Is(ctx context.Context, in *IsRequest, opts ...grpc.CallOption) (*IsResponse, error)
 	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
 	Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (*CompileResponse, error)
+	ListPolicies(ctx context.Context, in *ListPoliciesRequest, opts ...grpc.CallOption) (*ListPoliciesResponse, error)
+	GetPolicy(ctx context.Context, in *GetPolicyRequest, opts ...grpc.CallOption) (*GetPolicyResponse, error)
 }
 
 type authorizerClient struct {
@@ -72,6 +74,24 @@ func (c *authorizerClient) Compile(ctx context.Context, in *CompileRequest, opts
 	return out, nil
 }
 
+func (c *authorizerClient) ListPolicies(ctx context.Context, in *ListPoliciesRequest, opts ...grpc.CallOption) (*ListPoliciesResponse, error) {
+	out := new(ListPoliciesResponse)
+	err := c.cc.Invoke(ctx, "/aserto.authorizer.v2.Authorizer/ListPolicies", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizerClient) GetPolicy(ctx context.Context, in *GetPolicyRequest, opts ...grpc.CallOption) (*GetPolicyResponse, error) {
+	out := new(GetPolicyResponse)
+	err := c.cc.Invoke(ctx, "/aserto.authorizer.v2.Authorizer/GetPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthorizerServer is the server API for Authorizer service.
 // All implementations should embed UnimplementedAuthorizerServer
 // for forward compatibility
@@ -80,6 +100,8 @@ type AuthorizerServer interface {
 	Is(context.Context, *IsRequest) (*IsResponse, error)
 	Query(context.Context, *QueryRequest) (*QueryResponse, error)
 	Compile(context.Context, *CompileRequest) (*CompileResponse, error)
+	ListPolicies(context.Context, *ListPoliciesRequest) (*ListPoliciesResponse, error)
+	GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error)
 }
 
 // UnimplementedAuthorizerServer should be embedded to have forward compatible implementations.
@@ -97,6 +119,12 @@ func (UnimplementedAuthorizerServer) Query(context.Context, *QueryRequest) (*Que
 }
 func (UnimplementedAuthorizerServer) Compile(context.Context, *CompileRequest) (*CompileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Compile not implemented")
+}
+func (UnimplementedAuthorizerServer) ListPolicies(context.Context, *ListPoliciesRequest) (*ListPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
+func (UnimplementedAuthorizerServer) GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicy not implemented")
 }
 
 // UnsafeAuthorizerServer may be embedded to opt out of forward compatibility for this service.
@@ -182,6 +210,42 @@ func _Authorizer_Compile_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authorizer_ListPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizerServer).ListPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aserto.authorizer.v2.Authorizer/ListPolicies",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizerServer).ListPolicies(ctx, req.(*ListPoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Authorizer_GetPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizerServer).GetPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aserto.authorizer.v2.Authorizer/GetPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizerServer).GetPolicy(ctx, req.(*GetPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authorizer_ServiceDesc is the grpc.ServiceDesc for Authorizer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +268,14 @@ var Authorizer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Compile",
 			Handler:    _Authorizer_Compile_Handler,
+		},
+		{
+			MethodName: "ListPolicies",
+			Handler:    _Authorizer_ListPolicies_Handler,
+		},
+		{
+			MethodName: "GetPolicy",
+			Handler:    _Authorizer_GetPolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
