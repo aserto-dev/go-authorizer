@@ -34,6 +34,8 @@ var (
 	ErrBadRuntime = newErr("E30012", codes.Unavailable, http.StatusServiceUnavailable, "runtime loading failed")
 	// Returned if object object id is not found in the directory
 	ErrDirectoryObjectNotFound = newErr("E30013", codes.NotFound, http.StatusNotFound, "directory object not found")
+	// Returned if the loaded policy is invalid.
+	ErrInvalidPolicy = newErr("E30014", codes.Internal, http.StatusInternalServerError, "invalid policy")
 )
 
 func newErr(code string, statusCode codes.Code, httpCode int, msg string) *errors.AsertoError {
