@@ -28,6 +28,7 @@ type AuthorizerClient interface {
 	Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (*CompileResponse, error)
 	ListPolicies(ctx context.Context, in *ListPoliciesRequest, opts ...grpc.CallOption) (*ListPoliciesResponse, error)
 	GetPolicy(ctx context.Context, in *GetPolicyRequest, opts ...grpc.CallOption) (*GetPolicyResponse, error)
+	Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*InfoResponse, error)
 }
 
 type authorizerClient struct {
@@ -92,6 +93,15 @@ func (c *authorizerClient) GetPolicy(ctx context.Context, in *GetPolicyRequest, 
 	return out, nil
 }
 
+func (c *authorizerClient) Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*InfoResponse, error) {
+	out := new(InfoResponse)
+	err := c.cc.Invoke(ctx, "/aserto.authorizer.v2.Authorizer/Info", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthorizerServer is the server API for Authorizer service.
 // All implementations should embed UnimplementedAuthorizerServer
 // for forward compatibility
@@ -102,6 +112,7 @@ type AuthorizerServer interface {
 	Compile(context.Context, *CompileRequest) (*CompileResponse, error)
 	ListPolicies(context.Context, *ListPoliciesRequest) (*ListPoliciesResponse, error)
 	GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error)
+	Info(context.Context, *InfoRequest) (*InfoResponse, error)
 }
 
 // UnimplementedAuthorizerServer should be embedded to have forward compatible implementations.
@@ -125,6 +136,9 @@ func (UnimplementedAuthorizerServer) ListPolicies(context.Context, *ListPolicies
 }
 func (UnimplementedAuthorizerServer) GetPolicy(context.Context, *GetPolicyRequest) (*GetPolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPolicy not implemented")
+}
+func (UnimplementedAuthorizerServer) Info(context.Context, *InfoRequest) (*InfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
 }
 
 // UnsafeAuthorizerServer may be embedded to opt out of forward compatibility for this service.
@@ -246,6 +260,24 @@ func _Authorizer_GetPolicy_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authorizer_Info_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizerServer).Info(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/aserto.authorizer.v2.Authorizer/Info",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizerServer).Info(ctx, req.(*InfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authorizer_ServiceDesc is the grpc.ServiceDesc for Authorizer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -276,6 +308,10 @@ var Authorizer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPolicy",
 			Handler:    _Authorizer_GetPolicy_Handler,
+		},
+		{
+			MethodName: "Info",
+			Handler:    _Authorizer_Info_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
