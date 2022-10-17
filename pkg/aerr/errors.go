@@ -36,6 +36,8 @@ var (
 	ErrDirectoryObjectNotFound = newErr("E30013", codes.NotFound, http.StatusNotFound, "directory object not found")
 	// Returned if the loaded policy is invalid.
 	ErrInvalidPolicy = newErr("E30014", codes.Internal, http.StatusInternalServerError, "invalid policy")
+	// Returned when authorization has failed or is not possible
+	ErrAuthorizationFailed = newErr("E30015", codes.PermissionDenied, http.StatusUnauthorized, "authorization failed")
 )
 
 func newErr(code string, statusCode codes.Code, httpCode int, msg string) *errors.AsertoError {
