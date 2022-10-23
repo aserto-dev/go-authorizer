@@ -1,7 +1,5 @@
-# go-authorizer
+# go-directory
 
-Go bindings for the Authorizer Service API
+gRPC bindings of the Authorizer Service
 
-Generated from Buf image [https://buf.build/aserto-dev/authorizer](https://buf.build/aserto-dev/authorizer)
-
-Proto and gRPC definitions at [https://github.com/aserto-dev/pb-authorizer](https://github.com/aserto-dev/pb-authorizer)
+Generated from the Protobuf definition published to https://buf.build/aserto-dev/authorizer using [Buf](https://buf.build/).
