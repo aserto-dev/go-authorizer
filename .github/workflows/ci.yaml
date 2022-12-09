@@ -18,14 +18,14 @@ on:
 
 env:
   VAULT_ADDR: https://vault.eng.aserto.com/
-  GO_VERSION: "1.17"
+  GO_VERSION: "1.19"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: Read Configuration
-      uses: hashicorp/vault-action@v2.4.2
+      uses: hashicorp/vault-action@v2.4.3
       id: vault
       with:
         url: ${{ env.VAULT_ADDR }}
@@ -34,7 +34,7 @@ jobs:
           kv/data/buf.build "ASERTO_BUF_TOKEN"  | ASERTO_BUF_TOKEN;
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
