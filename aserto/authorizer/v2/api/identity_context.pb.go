@@ -32,7 +32,7 @@ const (
 	IdentityType_IDENTITY_TYPE_SUB IdentityType = 2
 	// JWT, identity field contains a JWT access token.
 	IdentityType_IDENTITY_TYPE_JWT IdentityType = 3
-	// Manual, will only propagate the identity context information as-is
+	// Manual, propagates thw identity field as-is, without validation, into the input object.
 	IdentityType_IDENTITY_TYPE_MANUAL IdentityType = 4
 )
 
