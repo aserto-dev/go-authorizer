@@ -204,7 +204,7 @@ func local_request_Authorizer_ListPolicies_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_Authorizer_GetPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Authorizer_GetPolicy_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0}, Base: []int{1, 2, 0, 0}, Check: []int{0, 1, 2, 2}}
 )
 
 func request_Authorizer_GetPolicy_0(ctx context.Context, marshaler runtime.Marshaler, client AuthorizerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -478,7 +478,7 @@ func RegisterAuthorizerHandlerServer(ctx context.Context, mux *runtime.ServeMux,
 // RegisterAuthorizerHandlerFromEndpoint is same as RegisterAuthorizerHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterAuthorizerHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
 	if err != nil {
 		return err
 	}
