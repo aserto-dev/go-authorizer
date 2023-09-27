@@ -8,31 +8,31 @@ bin:
     sha:
       linux-amd64: "88c280945db62b118435ec1bf0086a719f6b6551cba052e5f8d1e25a80884bca"
       linux-arm64: "e57e719e1eec9bce9057751e2583907210d3ac99c0a01897479506fbb2af828d"
-      darwin-amd64: "b398481bf33ebf9563cf69d7639014f0d652a2d5e26c0a9a424e2a39bb853354"
-      darwin-arm64: "20aead134ef8e77cb70efcfe047fc2e381793004fba103e7692b7dab00fe5131"
+      darwin-amd64: "6ca2c461fea2cef22266a747dad043df91d333b3ca98579e2a44230889a82aea"
+      darwin-arm64: "50c3f973effa013711abb17edbefe5435f7bc74b80cefd834dde1fba97680243"
 
 go:
   sver:
     importPath: "github.com/aserto-dev/sver/cmd/sver"
-    version: "v1.3.11"
+    version: "v1.3.13"
   svu:
     importPath: "github.com/caarlos0/svu"
-    version: "latest"
+    version: "v1.11.0"
   buf:
     importPath: "github.com/bufbuild/buf/cmd/buf"
-    version: "v1.9.0"
+    version: "v1.26.1"
   protoc-gen-buf-breaking:
     importPath: "github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking"
-    version: "v1.9.0"
+    version: "v1.26.1"
   protoc-gen-buf-lint:
     importPath: "github.com/bufbuild/buf/cmd/protoc-gen-buf-lint"
-    version: "v1.9.0"
+    version: "v1.26.1"
   protoc-gen-go:
     importPath: google.golang.org/protobuf/cmd/protoc-gen-go
-    version: "v1.28.1"
+    version: "v1.31.0"
   protoc-gen-go-grpc:
     importPath: google.golang.org/grpc/cmd/protoc-gen-go-grpc
     version: "latest"
   protoc-gen-grpc-gateway:
     importPath: "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway"
-    version: "v2.13.0"
+    version: "v2.17.1"

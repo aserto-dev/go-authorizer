@@ -1,11 +1,11 @@
 //go:build mage
+// +build mage
 
 package main
 
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -13,10 +13,9 @@ import (
 	"strings"
 
 	"github.com/aserto-dev/clui"
-	"github.com/aserto-dev/go-utils/fsutil"
 	"github.com/aserto-dev/mage-loot/buf"
 	"github.com/aserto-dev/mage-loot/deps"
-	"github.com/aserto-dev/mage-loot/mage"
+	"github.com/aserto-dev/mage-loot/fsutil"
 	"github.com/aserto-dev/mage-loot/testutil"
 	"github.com/magefile/mage/mg"
 )
@@ -43,37 +42,8 @@ func All() error {
 	return nil
 }
 
-// Builds the aserto proto image
-func BuildDev() error {
-	return mage.RunDirs(path.Join(getProtoRepo(), "magefiles"), getProtoRepo(), mage.AddArg("build"))
-}
-
-// Generates from a dev build.
-func GenerateDev() error {
-	err := BuildDev()
-	if err != nil {
-		return err
-	}
-
-	bufImage := filepath.Join(getProtoRepo(), "bin", "authorizer.bin#format=bin")
-	fileSources := filepath.Join(getProtoRepo(), "proto#format=dir")
-
-	return gen(bufImage, fileSources)
-}
-
-func getProtoRepo() string {
-	protoRepo := os.Getenv("PROTO_REPO")
-	if protoRepo == "" {
-		protoRepo = "../pb-authorizer"
-	}
-	return protoRepo
-}
-
-// Generate Go bindings for Authorizer
 func Generate() error {
 	bufImage := "buf.build/aserto-dev/authorizer"
-
-	os.Setenv("BUF_BETA_SUPPRESS_WARNINGS", "1")
 
 	tag, err := buf.GetLatestTag(bufImage)
 	if err != nil {
@@ -82,22 +52,119 @@ func Generate() error {
 		bufImage = fmt.Sprintf("%s:%s", bufImage, tag.Name)
 	}
 
-	if err := gen(bufImage, bufImage); err != nil {
+	if err := bufGenerate(bufImage); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Removes generated files
+func GenerateDev() error {
+	bufImage := "../pb-authorizer/bin/authorizer.bin"
+
+	if err := bufGenerate(bufImage); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// remove all built images files.
 func Clean() error {
 	return os.RemoveAll("aserto")
 }
 
-func gen(bufImage, fileSources string) error {
+func Lint() error {
+	mg.SerialDeps(Login)
 
-	files, err := getClientFiles(fileSources)
+	if err := bufLint("proto/buf.yaml", "bin/authorizer.bin"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Breaking() error {
+	mg.SerialDeps(Login)
+	bufImage := "buf.build/aserto-dev/authorizer"
+
+	tag, err := buf.GetLatestTag(bufImage)
 	if err != nil {
+		return err
+	}
+
+	if err := bufBreaking("proto", bufImage, tag); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Build() error {
+	mg.SerialDeps(Login)
+
+	if err := bufModUpdate("proto"); err != nil {
+		return err
+	}
+
+	if err := bufBuild("bin/authorizer.bin"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Push() error {
+	mg.SerialDeps(Login)
+
+	releaseVersion, _ := getLocalTag()
+	fmt.Println("tag", releaseVersion)
+
+	if err := bufBuild("bin/authorizer.bin"); err != nil {
+		return err
+	}
+
+	if err := bufPush("proto", releaseVersion); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Login() error {
+	if err := bufLogin(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func bufBreaking(dir, image string, tag buf.Tag) error {
+	return buf.Run(
+		buf.AddArg("breaking"),
+		buf.AddArg("--against"),
+		buf.AddArg(fmt.Sprintf("%s:%s", image, tag.Name)),
+		buf.AddArg(dir),
+	)
+}
+
+func bufPush(dir, version string) error {
+	if version == "" {
+		return buf.Run(
+			buf.AddArg("push"),
+			buf.AddArg(fmt.Sprintf("%s#format=dir", dir)),
+		)
+	}
+
+	return buf.Run(
+		buf.AddArg("push"),
+		buf.AddArg(fmt.Sprintf("%s#format=dir", dir)),
+		buf.AddArg("--tag"),
+		buf.AddArg(version),
+	)
+}
+
+func bufGenerate(image string) error {
+	if err := bufModUpdate("."); err != nil {
 		return err
 	}
 
@@ -116,45 +183,27 @@ func gen(bufImage, fileSources string) error {
 		"PATH": path,
 	},
 		buf.AddArg("generate"),
-		buf.AddArg("--template"),
-		buf.AddArg("buf.gen.yaml"),
-		buf.AddArg(bufImage),
-		buf.AddPaths(files),
+		buf.AddArg(image),
 	)
 }
 
-func getClientFiles(fileSources string) ([]string, error) {
-	var clientFiles []string
-
-	bufExportDir, err := ioutil.TempDir("", "bufimage")
-	if err != nil {
-		return clientFiles, err
-	}
-	bufExportDir = filepath.Join(bufExportDir, "")
-
-	defer os.RemoveAll(bufExportDir)
-	err = buf.Run(
-		buf.AddArg("export"),
-		buf.AddArg(fileSources),
-		buf.AddArg("--exclude-imports"),
-		buf.AddArg("-o"),
-		buf.AddArg(bufExportDir),
+func bufLint(config, bin string) error {
+	return buf.Run(
+		buf.AddArg("lint"),
+		buf.AddArg("--config"),
+		buf.AddArg(config),
+		buf.AddArg(bin),
 	)
-	if err != nil {
-		return clientFiles, err
-	}
-	//excludePattern := filepath.Join(bufExportDir, "aserto", "authorizer", "authorizer", "**", "*.proto")
+}
 
-	protoFiles, err := fsutil.Glob(filepath.Join(bufExportDir, "aserto", "**", "*.proto"), "")
-	if err != nil {
-		return clientFiles, err
-	}
+func bufBuild(bin string) error {
+	fsutil.EnsureDir(path.Dir(bin))
 
-	for _, protoFile := range protoFiles {
-		clientFiles = append(clientFiles, strings.TrimPrefix(protoFile, bufExportDir+string(filepath.Separator)))
-	}
-
-	return clientFiles, nil
+	return buf.Run(
+		buf.AddArg("build"),
+		buf.AddArg("--output"),
+		buf.AddArg(bin),
+	)
 }
 
 func bufModUpdate(dir string) error {
