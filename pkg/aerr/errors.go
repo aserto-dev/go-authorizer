@@ -21,7 +21,7 @@ var (
 	// Return if a user already exists
 	ErrUserAlreadyExists = newErr("E30006", codes.AlreadyExists, http.StatusConflict, "user already exists")
 	// Returned when authentication has failed or is not possible
-	ErrAuthenticationFailed = newErr("E30007", codes.FailedPrecondition, http.StatusUnauthorized, "authentication failed")
+	ErrAuthenticationFailed = newErr("E30007", codes.Unauthenticated, http.StatusUnauthorized, "authentication failed")
 	// Returned when a given parameter is incorrect (wrong format, value or type)
 	ErrInvalidArgument = newErr("E30008", codes.InvalidArgument, http.StatusBadRequest, "invalid argument")
 	// Return if a user is not found
