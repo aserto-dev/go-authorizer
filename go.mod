@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/aserto-dev/errors v0.0.7
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
-	github.com/magefile/mage v1.15.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240311173647-c811ad7063a7
 	google.golang.org/grpc v1.63.2
 	google.golang.org/protobuf v1.33.0
