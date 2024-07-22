@@ -20,7 +20,7 @@ env:
   VAULT_ADDR: https://vault.eng.aserto.com/
   BUF_REPO: "buf.build/aserto-dev/authorizer"
 
-  BUF_VERSION: "1.30.0"
+  BUF_VERSION: "1.34.0"
   BUF_BETA_SUPPRESS_WARNINGS: 1
   GO_VERSION: "1.22"
   GO_LANGCI_LINT_VERSION: "v1.56.2"
@@ -31,6 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - 
+      name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - 
       name: Read Configuration
       uses: hashicorp/vault-action@v3
       id: vault
@@ -38,12 +43,10 @@ jobs:
         url: ${{ env.VAULT_ADDR }}
         token: ${{ secrets.VAULT_TOKEN }}
         secrets: |
-          kv/data/buf.build "ASERTO_BUF_TOKEN"  | ASERTO_BUF_TOKEN;
-    - 
-      name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+          kv/data/github    "USERNAME"          | GH_USERNAME;
+          kv/data/github    "READ_WRITE_TOKEN"  | GH_TOKEN;
+          kv/data/buf.build "ASERTO_BUF_USER"   | BUF_USER;
+          kv/data/buf.build "ASERTO_BUF_TOKEN"  | BUF_TOKEN;
     - 
       name: Setup Go
       uses: actions/setup-go@v5
@@ -65,12 +68,11 @@ jobs:
       name: Get latest version tag from Buf Registry
       id: buf-latest
       run: |
-        echo "VERSION=$(buf beta registry tag list buf.build/aserto-dev/authorizer --format json --reverse | jq -r '.results[0].name')" >> "$GITHUB_OUTPUT"
+        echo "VERSION=$(buf beta registry label list ${BUF_REPO} --format json --reverse | jq -r '.results[0].name')" >> "$GITHUB_OUTPUT"
     - 
       name: Buf Generate
       run: |
         echo "${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}"
-        buf mod update .
         buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
     -
       name: Lint
