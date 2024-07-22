@@ -1,4 +1,4 @@
-# go-directory
+# go-authorizer
 
 gRPC bindings of the Authorizer Service
 
