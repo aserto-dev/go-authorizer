@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/aserto-dev/errors v0.0.9
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157
+	google.golang.org/genproto/googleapis/api v0.0.0-20240722135656-d784300faade
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 )
