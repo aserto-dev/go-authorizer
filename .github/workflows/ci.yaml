@@ -1,3 +1,4 @@
+---
 name: ci
 
 on:
@@ -30,69 +31,76 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - 
-      name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - 
-      name: Read Configuration
-      uses: hashicorp/vault-action@v3
-      id: vault
-      with:
-        url: ${{ env.VAULT_ADDR }}
-        token: ${{ secrets.VAULT_TOKEN }}
-        secrets: |
-          kv/data/github    "USERNAME"          | GH_USERNAME;
-          kv/data/github    "READ_WRITE_TOKEN"  | GH_TOKEN;
-          kv/data/buf.build "ASERTO_BUF_USER"   | BUF_USER;
-          kv/data/buf.build "ASERTO_BUF_TOKEN"  | BUF_TOKEN;
-    - 
-      name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - 
-      name: Setup buf
-      uses: bufbuild/buf-setup-action@v1
-      with:
-        version: ${{ env.BUF_VERSION }}
-        github_token: ${{ github.token }}
-        buf_user: ${{ steps.vault.outputs.BUF_USER }}
-        buf_api_token: ${{ steps.vault.outputs.BUF_TOKEN}}
-    - 
-      name: Delete generated code
-      run: |
-        rm -rf ./aserto
-    - 
-      name: Get latest version tag from Buf Registry
-      id: buf-latest
-      run: |
-        echo "VERSION=$(buf beta registry label list ${BUF_REPO} --format json --reverse | jq -r '.results[0].name')" >> "$GITHUB_OUTPUT"
-    - 
-      name: Buf Generate
-      run: |
-        echo "${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}"
-        buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
-    -
-      name: Lint
-      uses: golangci/golangci-lint-action@v4
-      with:
-        version: ${{ env.GO_LANGCI_LINT_VERSION }}
-        args: --timeout=30m
-    -
-      name: Test Setup
-      uses: gertd/action-gotestsum@v3.0.0
-      with:
-        gotestsum_version: ${{ env.GO_TESTSUM_VERSION }}
-    -
-      name: Test
-      run: |
-        gotestsum --format short-verbose -- -count=1 -parallel=1 -v -timeout=240s -coverprofile=cover.out -coverpkg=./... ./...
-    - 
-      name: Commit changes
-      if: github.event_name == 'workflow_dispatch'
-      uses: EndBug/add-and-commit@v9
-      with:
-        default_author: github_actions
-        add: 'aserto'
+      -
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.CODEGEN_APP_ID }}
+          private-key: ${{ secrets.CODEGEN_APP_KEY }}
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+      -
+        name: Read Configuration
+        uses: hashicorp/vault-action@v3
+        id: vault
+        with:
+          url: ${{ env.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            kv/data/github    "USERNAME"          | GH_USERNAME;
+            kv/data/github    "READ_WRITE_TOKEN"  | GH_TOKEN;
+            kv/data/buf.build "ASERTO_BUF_USER"   | BUF_USER;
+            kv/data/buf.build "ASERTO_BUF_TOKEN"  | BUF_TOKEN;
+      -
+        name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      -
+        name: Setup buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          version: ${{ env.BUF_VERSION }}
+          github_token: ${{ github.token }}
+          buf_user: ${{ steps.vault.outputs.BUF_USER }}
+          buf_api_token: ${{ steps.vault.outputs.BUF_TOKEN}}
+      -
+        name: Delete generated code
+        run: |
+          rm -rf ./aserto
+      -
+        name: Get latest version tag from Buf Registry
+        id: buf-latest
+        run: |
+          echo "VERSION=$(buf beta registry label list ${BUF_REPO} --format json --reverse | jq -r '.results[0].name')" >> "$GITHUB_OUTPUT"
+      -
+        name: Buf Generate
+        run: |
+          echo "${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}"
+          buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
+      -
+        name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: ${{ env.GO_LANGCI_LINT_VERSION }}
+          args: --timeout=30m
+      -
+        name: Test Setup
+        uses: gertd/action-gotestsum@v3.0.0
+        with:
+          gotestsum_version: ${{ env.GO_TESTSUM_VERSION }}
+      -
+        name: Test
+        run: |
+          gotestsum --format short-verbose -- -count=1 -parallel=1 -v -timeout=240s -coverprofile=cover.out -coverpkg=./... ./...
+      -
+        name: Commit changes
+        if: github.event_name == 'workflow_dispatch'
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          add: 'aserto'
