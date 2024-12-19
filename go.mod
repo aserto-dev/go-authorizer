@@ -1,6 +1,8 @@
 module github.com/aserto-dev/go-authorizer
 
-go 1.21
+go 1.22.10
+
+toolchain go1.23.4
 
 require (
 	github.com/aserto-dev/errors v0.0.11
