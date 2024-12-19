@@ -23,8 +23,8 @@ env:
 
   BUF_VERSION: "1.34.0"
   BUF_BETA_SUPPRESS_WARNINGS: 1
-  GO_VERSION: "1.22"
-  GO_LANGCI_LINT_VERSION: "v1.56.2"
+  GO_VERSION: "1.23"
+  GO_LANGCI_LINT_VERSION: "v1.61.0"
   GO_TESTSUM_VERSION: "1.11.0"
 
 jobs:
@@ -84,7 +84,7 @@ jobs:
           buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
       -
         name: Lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
           version: ${{ env.GO_LANGCI_LINT_VERSION }}
           args: --timeout=30m

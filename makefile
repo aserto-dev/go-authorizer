@@ -1,5 +1,5 @@
 SHELL           := $(shell which bash)
-    
+
 NO_COLOR        := \033[0m
 OK_COLOR        := \033[32;01m
 ERR_COLOR       := \033[31;01m
@@ -17,11 +17,9 @@ EXT_TMP_DIR     := ${EXT_DIR}/tmp
 
 VAULT_VERSION   := 1.8.12
 SVU_VERSION     := 1.12.0
-WIRE_VERSION    := 0.6.0
 BUF_VERSION     := 1.34.0
 GOTESTSUM_VERSION := 1.11.0
-GOLANGCI-LINT_VERSION := 1.56.2
-GORELEASER_VERSION := 1.24.0
+GOLANGCI-LINT_VERSION := 1.61.0
 
 PROJECT         := authorizer
 BUF_USER        := $(shell vault kv get -field ASERTO_BUF_USER kv/buf.build)
@@ -38,10 +36,6 @@ RELEASE_TAG	    := $$(svu)
 .PHONY: deps
 deps: info install-vault install-buf install-svu install-golangci-lint install-gotestsum
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-
-build:
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@${EXT_BIN_DIR}/goreleaser build --clean --snapshot --single-target
 
 lint:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
@@ -93,7 +87,7 @@ install-vault: ${EXT_BIN_DIR} ${EXT_TMP_DIR}
 	@curl -s -o ${EXT_TMP_DIR}/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_${GOOS}_${GOARCH}.zip
 	@unzip -o ${EXT_TMP_DIR}/vault.zip vault -d ${EXT_BIN_DIR}/  &> /dev/null
 	@chmod +x ${EXT_BIN_DIR}/vault
-	@${EXT_BIN_DIR}/vault --version 
+	@${EXT_BIN_DIR}/vault --version
 
 .PHONY: install-buf
 install-buf: ${EXT_BIN_DIR}
@@ -136,19 +130,6 @@ install-golangci-lint: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
 	@mv ${EXT_TMP_DIR}/golangci-lint ${EXT_BIN_DIR}/golangci-lint
 	@chmod +x ${EXT_BIN_DIR}/golangci-lint
 	@${EXT_BIN_DIR}/golangci-lint --version
-
-.PHONY: install-goreleaser
-install-goreleaser: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@gh release download v${GORELEASER_VERSION} --repo https://github.com/goreleaser/goreleaser --pattern "goreleaser_$$(uname -s)_$$(uname -m).tar.gz" --output "${EXT_TMP_DIR}/goreleaser.tar.gz" --clobber
-	@tar -xvf ${EXT_TMP_DIR}/goreleaser.tar.gz --directory ${EXT_BIN_DIR} goreleaser &> /dev/null
-	@chmod +x ${EXT_BIN_DIR}/goreleaser
-	@${EXT_BIN_DIR}/goreleaser --version
-
-.PHONY: install-wire
-install-wire: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@GOBIN=${PWD}/${EXT_BIN_DIR} go install github.com/google/wire/cmd/wire@v${WIRE_VERSION}
 
 .PHONY: clean
 clean:
