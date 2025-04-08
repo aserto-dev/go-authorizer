@@ -70,7 +70,7 @@ jobs:
           buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
       -
         name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: ${{ env.GO_LANGCI_LINT_VERSION }}
           args: --timeout=30m
