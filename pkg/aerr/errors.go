@@ -8,10 +8,6 @@ import (
 )
 
 var (
-	// ErrNoTenantID means no tenant id was found in the current context.
-	ErrNoTenantID = newErr("E30001", codes.InvalidArgument, http.StatusBadRequest, "no tenant id specified")
-	// ErrInvalidTenantID returned when the tenant id is not valid.
-	ErrInvalidTenantID = newErr("E30002", codes.InvalidArgument, http.StatusBadRequest, "invalid tenant id")
 	// ErrRuntimeLoading the asked-for runtime is not yet available, but will likely be in the future.
 	ErrRuntimeLoading = newErr("E30003", codes.Unavailable, http.StatusTooEarly, "runtime has not yet loaded")
 	// ErrPolicyNotFound returned if a policy id is not found in the database.

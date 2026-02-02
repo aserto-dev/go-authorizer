@@ -34,7 +34,6 @@ type Decision struct {
 	Outcomes      map[string]bool        `protobuf:"bytes,6,rep,name=outcomes,proto3" json:"outcomes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`      // outcome of the decisions specified in the policy context
 	Resource      *structpb.Struct       `protobuf:"bytes,7,opt,name=resource,proto3" json:"resource,omitempty"`                                                                                 // the resource context used in a decision
 	Annotations   map[string]string      `protobuf:"bytes,8,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // annotations that may be added to a decision
-	TenantId      *string                `protobuf:"bytes,9,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`                                                           // id of the tenant that generated the decision
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -125,19 +124,12 @@ func (x *Decision) GetAnnotations() map[string]string {
 	return nil
 }
 
-func (x *Decision) GetTenantId() string {
-	if x != nil && x.TenantId != nil {
-		return *x.TenantId
-	}
-	return ""
-}
-
 // information about a user on behalf of whom a decision was made
 type DecisionUser struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Context       *IdentityContext       `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"` // identity context used in the decision
 	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`           // id of the user the identity resolved to
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`     // convinience human-readable identifier
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`     // convenience human-readable identifier
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -201,7 +193,6 @@ type DecisionPolicy struct {
 	RegistryImage   string                 `protobuf:"bytes,3,opt,name=registry_image,json=registryImage,proto3" json:"registry_image,omitempty"`       // image of the policy in the registry, including org (e.g. acmecorp/peoplefinder-abac)
 	RegistryTag     string                 `protobuf:"bytes,4,opt,name=registry_tag,json=registryTag,proto3" json:"registry_tag,omitempty"`             // tag of the policy image (e.g. 0.8.2 or latest)
 	RegistryDigest  string                 `protobuf:"bytes,5,opt,name=registry_digest,json=registryDigest,proto3" json:"registry_digest,omitempty"`    // digest of the policy image
-	PolicyInstance  *PolicyInstance        `protobuf:"bytes,6,opt,name=policy_instance,json=policyInstance,proto3" json:"policy_instance,omitempty"`    // policy instance used in decision
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -271,18 +262,11 @@ func (x *DecisionPolicy) GetRegistryDigest() string {
 	return ""
 }
 
-func (x *DecisionPolicy) GetPolicyInstance() *PolicyInstance {
-	if x != nil {
-		return x.PolicyInstance
-	}
-	return nil
-}
-
 var File_aserto_authorizer_v2_api_decision_logs_proto protoreflect.FileDescriptor
 
 const file_aserto_authorizer_v2_api_decision_logs_proto_rawDesc = "" +
 	"\n" +
-	",aserto/authorizer/v2/api/decision_logs.proto\x12\x18aserto.authorizer.v2.api\x1a/aserto/authorizer/v2/api/identity_context.proto\x1a-aserto/authorizer/v2/api/policy_context.proto\x1a.aserto/authorizer/v2/api/policy_instance.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xed\x04\n" +
+	",aserto/authorizer/v2/api/decision_logs.proto\x12\x18aserto.authorizer.v2.api\x1a/aserto/authorizer/v2/api/identity_context.proto\x1a-aserto/authorizer/v2/api/policy_context.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xce\x04\n" +
 	"\bDecision\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x128\n" +
 	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n" +
@@ -291,27 +275,24 @@ const file_aserto_authorizer_v2_api_decision_logs_proto_rawDesc = "" +
 	"\x06policy\x18\x05 \x01(\v2(.aserto.authorizer.v2.api.DecisionPolicyR\x06policy\x12L\n" +
 	"\boutcomes\x18\x06 \x03(\v20.aserto.authorizer.v2.api.Decision.OutcomesEntryR\boutcomes\x123\n" +
 	"\bresource\x18\a \x01(\v2\x17.google.protobuf.StructR\bresource\x12U\n" +
-	"\vannotations\x18\b \x03(\v23.aserto.authorizer.v2.api.Decision.AnnotationsEntryR\vannotations\x12 \n" +
-	"\ttenant_id\x18\t \x01(\tH\x00R\btenantId\x88\x01\x01\x1a;\n" +
+	"\vannotations\x18\b \x03(\v23.aserto.authorizer.v2.api.Decision.AnnotationsEntryR\vannotations\x1a;\n" +
 	"\rOutcomesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\bR\x05value:\x028\x01\x1a>\n" +
 	"\x10AnnotationsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\f\n" +
-	"\n" +
-	"_tenant_id\"y\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\t\x10\n" +
+	"R\ttenant_id\"y\n" +
 	"\fDecisionUser\x12C\n" +
 	"\acontext\x18\x01 \x01(\v2).aserto.authorizer.v2.api.IdentityContextR\acontext\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\"\xc4\x02\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\"\x88\x02\n" +
 	"\x0eDecisionPolicy\x12A\n" +
 	"\acontext\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextR\acontext\x12)\n" +
 	"\x10registry_service\x18\x02 \x01(\tR\x0fregistryService\x12%\n" +
 	"\x0eregistry_image\x18\x03 \x01(\tR\rregistryImage\x12!\n" +
 	"\fregistry_tag\x18\x04 \x01(\tR\vregistryTag\x12'\n" +
-	"\x0fregistry_digest\x18\x05 \x01(\tR\x0eregistryDigest\x12Q\n" +
-	"\x0fpolicy_instance\x18\x06 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceR\x0epolicyInstanceB]Z@github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api\xaa\x02\x18Aserto.Authorizer.V2.APIb\x06proto3"
+	"\x0fregistry_digest\x18\x05 \x01(\tR\x0eregistryDigestJ\x04\b\x06\x10\aR\x0fpolicy_instanceB]Z@github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api\xaa\x02\x18Aserto.Authorizer.V2.APIb\x06proto3"
 
 var (
 	file_aserto_authorizer_v2_api_decision_logs_proto_rawDescOnce sync.Once
@@ -336,7 +317,6 @@ var file_aserto_authorizer_v2_api_decision_logs_proto_goTypes = []any{
 	(*structpb.Struct)(nil),       // 6: google.protobuf.Struct
 	(*IdentityContext)(nil),       // 7: aserto.authorizer.v2.api.IdentityContext
 	(*PolicyContext)(nil),         // 8: aserto.authorizer.v2.api.PolicyContext
-	(*PolicyInstance)(nil),        // 9: aserto.authorizer.v2.api.PolicyInstance
 }
 var file_aserto_authorizer_v2_api_decision_logs_proto_depIdxs = []int32{
 	5, // 0: aserto.authorizer.v2.api.Decision.timestamp:type_name -> google.protobuf.Timestamp
@@ -347,12 +327,11 @@ var file_aserto_authorizer_v2_api_decision_logs_proto_depIdxs = []int32{
 	4, // 5: aserto.authorizer.v2.api.Decision.annotations:type_name -> aserto.authorizer.v2.api.Decision.AnnotationsEntry
 	7, // 6: aserto.authorizer.v2.api.DecisionUser.context:type_name -> aserto.authorizer.v2.api.IdentityContext
 	8, // 7: aserto.authorizer.v2.api.DecisionPolicy.context:type_name -> aserto.authorizer.v2.api.PolicyContext
-	9, // 8: aserto.authorizer.v2.api.DecisionPolicy.policy_instance:type_name -> aserto.authorizer.v2.api.PolicyInstance
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_aserto_authorizer_v2_api_decision_logs_proto_init() }
@@ -362,8 +341,6 @@ func file_aserto_authorizer_v2_api_decision_logs_proto_init() {
 	}
 	file_aserto_authorizer_v2_api_identity_context_proto_init()
 	file_aserto_authorizer_v2_api_policy_context_proto_init()
-	file_aserto_authorizer_v2_api_policy_instance_proto_init()
-	file_aserto_authorizer_v2_api_decision_logs_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
