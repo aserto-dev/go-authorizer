@@ -10,33 +10,29 @@ GOOS               := $(shell go env GOOS)
 GOARCH             := $(shell go env GOARCH)
 GOPRIVATE          := "github.com/aserto-dev"
 
-BIN_DIR            := ./bin
 EXT_DIR            := ${PWD}/.ext
 EXT_BIN_DIR        := ${EXT_DIR}/bin
 EXT_TMP_DIR        := ${EXT_DIR}/tmp
 
-GO_VER             := 1.24
-VAULT_VER          := 1.8.12
-SVU_VER            := 3.2.3
-GOTESTSUM_VER      := 1.12.1
-GOLANGCI-LINT_VER  := 2.0.2
-GORELEASER_VER     := 2.8.2
-BUF_VER            := 1.52.1
+GO_VER             := 1.25
+SVU_VER 	         := 3.3.0
+GOTESTSUM_VER      := 1.13.0
+GOLANGCI-LINT_VER  := 2.6.2
+GORELEASER_VER     := 2.9.0
+BUF_VER            := 1.64.0
 
 PROJECT            := authorizer
-BUF_USER           := $(shell ${EXT_BIN_DIR}/vault kv get -field ASERTO_BUF_USER kv/buf.build)
-BUF_TOKEN          := $(shell ${EXT_BIN_DIR}/vault kv get -field ASERTO_BUF_TOKEN kv/buf.build)
-BUF_REPO           := "buf.build/aserto-dev/${PROJECT}"
+PROTO_REPO         := pb-${PROJECT}
+BUF_REPO           := buf.build/aserto-dev/${PROJECT}
 BUF_LATEST         := $(shell ${EXT_BIN_DIR}/buf registry module label list ${BUF_REPO} --format json | jq -r '.labels[0].name')
-BUF_DEV_IMAGE      := "${PROJECT}.bin"
-PROTO_REPO         := "pb-${PROJECT}"
+BUF_DEV_IMAGE      := ../${PROTO_REPO$}/bin/${PROJECT}.bin
 
 RELEASE_TAG        := $$(${EXT_BIN_DIR}/svu current)
 
 .DEFAULT_GOAL      := lint
 
 .PHONY: deps
-deps: info install-vault install-buf install-svu install-golangci-lint install-gotestsum
+deps: info install-buf install-svu install-golangci-lint install-gotestsum
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 
 .PHONY: gover
@@ -56,30 +52,31 @@ test: gover
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@${EXT_BIN_DIR}/gotestsum --format short-verbose -- -count=1 -v ${PWD}/... -coverprofile=cover.out -coverpkg=./... ${PWD}/...
 
-.PHONY: vault-login
-vault-login:
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@vault login -method=github token=$$(gh auth token)
-
 .PHONY: buf-login
 buf-login:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@echo ${BUF_TOKEN} | ${EXT_BIN_DIR}/buf registry login --username ${BUF_USER} --token-stdin
+	@${EXT_BIN_DIR}/buf registry login
 
 .PHONY: buf-generate
-buf-generate:
+buf-generate: buf-generate-clean
 	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_REPO}:${BUF_LATEST}$(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf generate ${BUF_REPO}:${BUF_LATEST}
 
 .PHONY: buf-generate-dev
-buf-generate-dev:
-	@echo -e "$(ATTN_COLOR)==> $@ ../${PROTO_REPO}/bin/${BUF_DEV_IMAGE}$(NO_COLOR)"
-	@${EXT_BIN_DIR}/buf generate "../${PROTO_REPO}/bin/${BUF_DEV_IMAGE}"
+buf-generate-dev: ${BUF_DEV_IMAGE} buf-generate-clean
+	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_DEV_IMAGE}$(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf generate ${BUF_DEV_IMAGE}
+
+.PHONY: buf-generate-clean
+buf-generate-clean: ./aserto
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@rm -rf ./aserto
 
 .PHONY: info
 info:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@echo "PROJECT:       ${PROJECT}"
+	@echo "PROTO_REPO:    ${PROTO_REPO}"
 	@echo "GOOS:          ${GOOS}"
 	@echo "GOARCH:        ${GOARCH}"
 	@echo "EXT_BIN_DIR:   ${EXT_BIN_DIR}"
@@ -87,17 +84,8 @@ info:
 	@echo "RELEASE_TAG:   ${RELEASE_TAG}"
 	@echo "BUF_REPO:      ${BUF_REPO}"
 	@echo "BUF_LATEST:    ${BUF_LATEST}"
-	@echo "BUF_DEV_IMAGE: ${BIN_DIR}/${BUF_DEV_IMAGE}"
-	@echo "PROTO_REPO:    ${PROTO_REPO}"
-
-.PHONY: install-vault
-install-vault: ${EXT_BIN_DIR} ${EXT_TMP_DIR}
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@curl -s -o ${EXT_TMP_DIR}/vault.zip https://releases.hashicorp.com/vault/${VAULT_VER}/vault_${VAULT_VER}_${GOOS}_${GOARCH}.zip
-	@unzip -o ${EXT_TMP_DIR}/vault.zip vault -d ${EXT_BIN_DIR}/  &> /dev/null
-	@chmod +x ${EXT_BIN_DIR}/vault
-	@${EXT_BIN_DIR}/vault --version
-
+	@echo "BUF_DEV_IMAGE: ${BUF_DEV_IMAGE}"
+	
 .PHONY: install-buf
 install-buf: ${EXT_BIN_DIR}
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"

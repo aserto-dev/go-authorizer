@@ -14,15 +14,24 @@ linters:
     - exhaustruct
     - gochecknoglobals  # no configuration options
     - nlreturn  # redundant with wsl
+    - noinlineerr 
     - paralleltest
     - revive
     - thelper
     - varnamelen
     - wrapcheck
+    - wsl
 
   settings:
     cyclop:
       max-complexity: 12
+
+    errcheck:
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - os.Close
 
     funlen:
       lines: 80
@@ -32,7 +41,10 @@ linters:
     ireturn:
       allow:
         - error
+        - empty
+        - stdlib
         - generic
+        - proto.Message
         - context.Context
 
     lll:
@@ -43,6 +55,15 @@ linters:
         rules:
           json: snake
           yaml: snake
+
+              
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2 
+
+  exclusions:
+    generated: lax
 
 formatters:
   enable:
