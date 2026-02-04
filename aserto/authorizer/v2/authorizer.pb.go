@@ -1264,11 +1264,15 @@ const file_aserto_authorizer_v2_authorizer_proto_rawDesc = "" +
 	"\x14\n" +
 	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v2/policies/{id=*/**}\x12\x9b\x01\n" +
 	"\x04Info\x12!.aserto.authorizer.v2.InfoRequest\x1a\".aserto.authorizer.v2.InfoResponse\"L\x92A5\n" +
-	"\x04Info\x12\x04Info\x1a\x1bReturn version information.*\binfo.getb\x00\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v2/infoB\xc9\x01\x92Aj*\x01\x022\x10application/json:\x10application/jsonZ)\n" +
+	"\x04Info\x12\x04Info\x1a\x1bReturn version information.*\binfo.getb\x00\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v2/infoB\xf1\x03\x92A\x91\x03\x12\xbf\x01\n" +
+	"\x12Authorizer Service\"O\n" +
+	"\fAserto, Inc.\x12+https://github.com/aserto-dev/pb-authorizer\x1a\x12support@aserto.com*S\n" +
+	"\x12Apache 2.0 License\x12=https://github.com/aserto-dev/pb-authorizer/blob/main/LICENSE2\x032.1*\x02\x01\x022\x10application/json:\x10application/jsonZ)\n" +
 	"'\n" +
 	"\x10AuthorizerAPIKey\x12\x13\b\x02\x1a\rauthorization \x02b\x16\n" +
 	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00ZCgithub.com/aserto-dev/go-authorizer/aserto/authorizer/v2;authorizer\xaa\x02\x14Aserto.Authorizer.V2b\x06proto3"
+	"\x10AuthorizerAPIKey\x12\x00rb\n" +
+	"\x19Authorizer API Reference.\x12Ehttps://github.com/aserto-dev/pb-authorizer/blob/main/html/index.htmlZCgithub.com/aserto-dev/go-authorizer/aserto/authorizer/v2;authorizer\xaa\x02\x14Aserto.Authorizer.V2b\x06proto3"
 
 var (
 	file_aserto_authorizer_v2_authorizer_proto_rawDescOnce sync.Once
