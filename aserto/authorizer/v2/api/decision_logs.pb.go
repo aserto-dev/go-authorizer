@@ -193,8 +193,10 @@ type DecisionPolicy struct {
 	RegistryImage   string                 `protobuf:"bytes,3,opt,name=registry_image,json=registryImage,proto3" json:"registry_image,omitempty"`       // image of the policy in the registry, including org (e.g. acmecorp/peoplefinder-abac)
 	RegistryTag     string                 `protobuf:"bytes,4,opt,name=registry_tag,json=registryTag,proto3" json:"registry_tag,omitempty"`             // tag of the policy image (e.g. 0.8.2 or latest)
 	RegistryDigest  string                 `protobuf:"bytes,5,opt,name=registry_digest,json=registryDigest,proto3" json:"registry_digest,omitempty"`    // digest of the policy image
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Deprecated: Marked as deprecated in aserto/authorizer/v2/api/decision_logs.proto.
+	PolicyInstance *PolicyInstance `protobuf:"bytes,6,opt,name=policy_instance,json=policyInstance,proto3" json:"policy_instance,omitempty"` // policy instance used in decision
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DecisionPolicy) Reset() {
@@ -262,11 +264,19 @@ func (x *DecisionPolicy) GetRegistryDigest() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in aserto/authorizer/v2/api/decision_logs.proto.
+func (x *DecisionPolicy) GetPolicyInstance() *PolicyInstance {
+	if x != nil {
+		return x.PolicyInstance
+	}
+	return nil
+}
+
 var File_aserto_authorizer_v2_api_decision_logs_proto protoreflect.FileDescriptor
 
 const file_aserto_authorizer_v2_api_decision_logs_proto_rawDesc = "" +
 	"\n" +
-	",aserto/authorizer/v2/api/decision_logs.proto\x12\x18aserto.authorizer.v2.api\x1a/aserto/authorizer/v2/api/identity_context.proto\x1a-aserto/authorizer/v2/api/policy_context.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xce\x04\n" +
+	",aserto/authorizer/v2/api/decision_logs.proto\x12\x18aserto.authorizer.v2.api\x1a/aserto/authorizer/v2/api/identity_context.proto\x1a-aserto/authorizer/v2/api/policy_context.proto\x1a.aserto/authorizer/v2/api/policy_instance.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xce\x04\n" +
 	"\bDecision\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x128\n" +
 	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n" +
@@ -286,13 +296,14 @@ const file_aserto_authorizer_v2_api_decision_logs_proto_rawDesc = "" +
 	"\fDecisionUser\x12C\n" +
 	"\acontext\x18\x01 \x01(\v2).aserto.authorizer.v2.api.IdentityContextR\acontext\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\"\x88\x02\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\"\xc8\x02\n" +
 	"\x0eDecisionPolicy\x12A\n" +
 	"\acontext\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextR\acontext\x12)\n" +
 	"\x10registry_service\x18\x02 \x01(\tR\x0fregistryService\x12%\n" +
 	"\x0eregistry_image\x18\x03 \x01(\tR\rregistryImage\x12!\n" +
 	"\fregistry_tag\x18\x04 \x01(\tR\vregistryTag\x12'\n" +
-	"\x0fregistry_digest\x18\x05 \x01(\tR\x0eregistryDigestJ\x04\b\x06\x10\aR\x0fpolicy_instanceB]Z@github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api\xaa\x02\x18Aserto.Authorizer.V2.APIb\x06proto3"
+	"\x0fregistry_digest\x18\x05 \x01(\tR\x0eregistryDigest\x12U\n" +
+	"\x0fpolicy_instance\x18\x06 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01R\x0epolicyInstanceB]Z@github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api\xaa\x02\x18Aserto.Authorizer.V2.APIb\x06proto3"
 
 var (
 	file_aserto_authorizer_v2_api_decision_logs_proto_rawDescOnce sync.Once
@@ -317,6 +328,7 @@ var file_aserto_authorizer_v2_api_decision_logs_proto_goTypes = []any{
 	(*structpb.Struct)(nil),       // 6: google.protobuf.Struct
 	(*IdentityContext)(nil),       // 7: aserto.authorizer.v2.api.IdentityContext
 	(*PolicyContext)(nil),         // 8: aserto.authorizer.v2.api.PolicyContext
+	(*PolicyInstance)(nil),        // 9: aserto.authorizer.v2.api.PolicyInstance
 }
 var file_aserto_authorizer_v2_api_decision_logs_proto_depIdxs = []int32{
 	5, // 0: aserto.authorizer.v2.api.Decision.timestamp:type_name -> google.protobuf.Timestamp
@@ -327,11 +339,12 @@ var file_aserto_authorizer_v2_api_decision_logs_proto_depIdxs = []int32{
 	4, // 5: aserto.authorizer.v2.api.Decision.annotations:type_name -> aserto.authorizer.v2.api.Decision.AnnotationsEntry
 	7, // 6: aserto.authorizer.v2.api.DecisionUser.context:type_name -> aserto.authorizer.v2.api.IdentityContext
 	8, // 7: aserto.authorizer.v2.api.DecisionPolicy.context:type_name -> aserto.authorizer.v2.api.PolicyContext
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	9, // 8: aserto.authorizer.v2.api.DecisionPolicy.policy_instance:type_name -> aserto.authorizer.v2.api.PolicyInstance
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_aserto_authorizer_v2_api_decision_logs_proto_init() }
@@ -341,6 +354,7 @@ func file_aserto_authorizer_v2_api_decision_logs_proto_init() {
 	}
 	file_aserto_authorizer_v2_api_identity_context_proto_init()
 	file_aserto_authorizer_v2_api_policy_context_proto_init()
+	file_aserto_authorizer_v2_api_policy_instance_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
