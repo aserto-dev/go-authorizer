@@ -37,7 +37,7 @@ var (
 	// ErrResolvingSubjectFromIdentityContext.
 	ErrResolvingSubjectFromIdentityContext = newErr("E30016", codes.NotFound, http.StatusNotFound, "failed to resolve subject from identity context")
 	// ErrResolvingUserFromSubject.
-	ErrResolvingUserFromSubject = newErr("E30017", codes.NotFound, http.StatusNotFound, "failed to resolve user from identity")
+	ErrResolvingUserFromSubject = newErr("E30017", codes.NotFound, http.StatusNotFound, "failed to resolve user from subject")
 )
 
 func newErr(code string, statusCode codes.Code, httpCode int, msg string) *errors.AsertoError {
