@@ -4,10 +4,8 @@ go 1.26
 
 toolchain go1.26.7
 
-// replace github.com/aserto-dev/errors => ../errors
-
 require (
-	github.com/aserto-dev/errors v0.34.1-0.20260824131513-21f43c970ba0
+	github.com/aserto-dev/errors v0.34.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260819154853-08b0e4226688
 	google.golang.org/grpc v1.83.1

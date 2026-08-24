@@ -20,7 +20,6 @@ env:
   BUF_REPO: "buf.build/aserto-dev/authorizer"
   BUF_VER: 1.72.0
   GO_LANGCI_LINT_VER: "v2.13.1"
-  GO_TESTSUM_VER: 1.13.0
 
 jobs:
   build:

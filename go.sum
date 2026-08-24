@@ -1,5 +1,5 @@
-github.com/aserto-dev/errors v0.34.1-0.20260824131513-21f43c970ba0 h1:whM2KufeDLlsWizTXPbTy6NZaKLdKai9+1q1Pg23HYg=
-github.com/aserto-dev/errors v0.34.1-0.20260824131513-21f43c970ba0/go.mod h1:DjH9+A2lmK8q4p+Ml0djJEDwkMVDdRHFabURPPpfM/k=
+github.com/aserto-dev/errors v0.34.1 h1:nLLqNdH0WdqXluXoilawT67ZcQYfDFjD17tKcCVn5jA=
+github.com/aserto-dev/errors v0.34.1/go.mod h1:DjH9+A2lmK8q4p+Ml0djJEDwkMVDdRHFabURPPpfM/k=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/go-logr/logr v1.4.4 h1:tG4xh9yMsRCAiodLVTxyrkzSZ9+o0L1Kg/+cPVcbP/8=
