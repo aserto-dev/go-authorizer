@@ -34,6 +34,10 @@ var (
 	ErrInvalidPolicy = newErr("E30014", codes.Internal, http.StatusInternalServerError, "invalid policy")
 	// ErrAuthorizationFailed returned when authorization has failed or is not possible.
 	ErrAuthorizationFailed = newErr("E30015", codes.PermissionDenied, http.StatusUnauthorized, "authorization failed")
+	// ErrResolvingSubjectFromIdentityContext.
+	ErrResolvingSubjectFromIdentityContext = newErr("E30016", codes.NotFound, http.StatusNotFound, "failed to resolve subject from identity context")
+	// ErrResolvingUserFromSubject.
+	ErrResolvingUserFromSubject = newErr("E30017", codes.NotFound, http.StatusNotFound, "failed to resolve user from identity")
 )
 
 func newErr(code string, statusCode codes.Code, httpCode int, msg string) *errors.AsertoError {
