@@ -18,32 +18,35 @@ on:
 
 env:
   BUF_REPO: "buf.build/aserto-dev/authorizer"
-  BUF_VER: 1.66.1
-  GO_LANGCI_LINT_VER: 2.11.4
-  GO_TESTSUM_VER: 1.13.0
+  BUF_VER: 1.72.0
+  GO_LANGCI_LINT_VER: "v2.13.1"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          app-id: ${{ vars.CODEGEN_APP_ID }}
+          client-id: ${{ vars.CODEGEN_APP_ID }}
           private-key: ${{ secrets.CODEGEN_APP_KEY }}
       -
         name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
       -
         name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: 'go.mod'
           cache: true
+      -
+        name: Test Setup
+        run: |
+          make install-gotestsum
       -
         name: Setup buf
         uses: bufbuild/buf-action@v1
@@ -68,21 +71,16 @@ jobs:
         name: Lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v${{ env.GO_LANGCI_LINT_VER }}
+          version: ${{ env.GO_LANGCI_LINT_VER }}
           args: --timeout=5m
-      -
-        name: Test Setup
-        uses: gertd/action-gotestsum@v3.0.0
-        with:
-          gotestsum_version: ${{ env.GO_TESTSUM_VER }}
       -
         name: Test
         run: |
-          gotestsum --format short-verbose -- -count=1 -parallel=1 -v -timeout=240s -coverprofile=cover.out -coverpkg=./... ./...
+          .ext/bin/gotestsum --format short-verbose -- -count=1 -parallel=1 -v -timeout=240s -coverprofile=cover.out -coverpkg=./... ./...
       -
         name: Commit changes
         if: github.event_name == 'workflow_dispatch'
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v11
         with:
           default_author: github_actions
           add: 'aserto'

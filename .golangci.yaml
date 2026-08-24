@@ -12,6 +12,7 @@ linters:
   disable:
     - depguard
     - exhaustruct
+    - gomodguard # is deprecated (since v2.12.0) due to: new major version.
     - gochecknoglobals  # no configuration options
     - nlreturn  # redundant with wsl
     - noinlineerr 

@@ -15,11 +15,11 @@ EXT_BIN_DIR        := ${EXT_DIR}/bin
 EXT_TMP_DIR        := ${EXT_DIR}/tmp
 
 GO_VER             := 1.26
-SVU_VER            := 3.3.0
+SVU_VER            := 3.4.1
 GOTESTSUM_VER      := 1.13.0
-GOLANGCI-LINT_VER  := 2.11.4
-GORELEASER_VER     := 2.14.1
-BUF_VER            := 1.66.1
+GOLANGCI-LINT_VER  := 2.13.1
+GORELEASER_VER     := 2.17.1
+BUF_VER            := 1.72.0
 
 PROJECT            := authorizer
 PROTO_REPO         := pb-${PROJECT}
