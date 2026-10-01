@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package aserto.authorizer.v2.api;
+
+import "google/protobuf/struct.proto";
+
+option csharp_namespace = "Aserto.Authorizer.V2.API";
+option go_package = "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api";
+
+message Module {
+  optional string id = 1;
+  optional string raw = 2;
+  optional string package_path = 3;
+  optional google.protobuf.Value ast = 4;
+  optional string package_root = 5;
+}

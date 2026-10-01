@@ -1,0 +1,306 @@
+syntax = "proto3";
+
+package aserto.authorizer.v2;
+
+import "aserto/authorizer/v2/api/identity_context.proto";
+import "aserto/authorizer/v2/api/module.proto";
+import "aserto/authorizer/v2/api/policy_context.proto";
+import "aserto/authorizer/v2/api/policy_instance.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option csharp_namespace = "Aserto.Authorizer.V2";
+option go_package = "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2;authorizer";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Authorizer Service"
+    version: "2.1"
+    contact: {
+      name: "Aserto, Inc."
+      url: "https://github.com/aserto-dev/pb-authorizer"
+      email: "support@aserto.com"
+    }
+    license: {
+      name: "Apache 2.0 License"
+      url: "https://github.com/aserto-dev/pb-authorizer/blob/main/LICENSE"
+    }
+  }
+
+  external_docs: {
+    url: "https://github.com/aserto-dev/pb-authorizer/blob/main/html/index.html"
+    description: "Authorizer API Reference."
+  }
+
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+
+  security_definitions: {
+    security: {
+      key: "AuthorizerAPIKey"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "authorization"
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "AuthorizerAPIKey"
+      value: {}
+    }
+  }
+};
+
+service Authorizer {
+  rpc DecisionTree(DecisionTreeRequest) returns (DecisionTreeResponse) {
+    option (google.api.http) = {
+      post: "/api/v2/authz/decisiontree"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Authorizer"
+      summary: "Decision tree"
+      description: "Returns decision tree for given identity context."
+      operation_id: "authorizer.decision_tree"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc Is(IsRequest) returns (IsResponse) {
+    option (google.api.http) = {
+      post: "/api/v2/authz/is"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Authorizer"
+      summary: "Is (authorized)"
+      description: "Determines if identity context is authorized to access the resource guarded by the given policy."
+      operation_id: "authorizer.is"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc Query(QueryRequest) returns (QueryResponse) {
+    option (google.api.http) = {
+      post: "/api/v2/authz/query"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Authorizer"
+      summary: "Query"
+      description: "Executes a rego query on the loaded policy runtime."
+      operation_id: "authorizer.query"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc Compile(CompileRequest) returns (CompileResponse) {
+    option (google.api.http) = {
+      post: "/api/v2/authz/compile"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Authorizer"
+      summary: "Compile"
+      description: "Executes a partial query on the loaded policy runtime."
+      operation_id: "authorizer.compile"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
+    option (google.api.http) = {get: "/api/v2/policies"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Policy"
+      summary: "List Policies"
+      description: "Lists the policy modules for the policy bundle."
+      operation_id: "policies.list"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse) {
+    option (google.api.http) = {get: "/api/v2/policies/{id=*/**}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Policy"
+      summary: "Get Policy"
+      description: "Gets the policy modules for the given module Id."
+      operation_id: "policies.get"
+      deprecated: false
+      security: {
+        security_requirement: {
+          key: "AuthorizerAPIKey"
+          value: {}
+        }
+      }
+    };
+  }
+
+  rpc Info(InfoRequest) returns (InfoResponse) {
+    option (google.api.http) = {get: "/api/v2/info"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Info"
+      summary: "Info"
+      description: "Return version information."
+      operation_id: "info.get"
+      deprecated: false
+      security: {}
+    };
+  }
+}
+
+message InfoRequest {}
+
+message InfoResponse {
+  string version = 1;
+  string commit = 2;
+  string date = 3;
+  string os = 4;
+  string arch = 5;
+}
+
+message GetPolicyRequest {
+  string id = 1;
+  google.protobuf.FieldMask field_mask = 2;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 3 [deprecated = true];
+}
+
+message GetPolicyResponse {
+  aserto.authorizer.v2.api.Module result = 1;
+}
+
+message ListPoliciesRequest {
+  google.protobuf.FieldMask field_mask = 1;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 2 [deprecated = true];
+}
+
+message ListPoliciesResponse {
+  repeated aserto.authorizer.v2.api.Module result = 1;
+}
+
+message DecisionTreeRequest {
+  aserto.authorizer.v2.api.PolicyContext policy_context = 1;
+  aserto.authorizer.v2.api.IdentityContext identity_context = 2;
+  DecisionTreeOptions options = 3;
+  google.protobuf.Struct resource_context = 4;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 5 [deprecated = true];
+}
+
+enum PathSeparator {
+  PATH_SEPARATOR_UNKNOWN = 0; // Value not set.
+  PATH_SEPARATOR_DOT = 1; // Dot "." path separator
+  PATH_SEPARATOR_SLASH = 2; // Slash "/" path separator
+}
+
+message DecisionTreeOptions {
+  PathSeparator path_separator = 1;
+  reserved 2; // removed "grouping"
+}
+
+message DecisionTreeResponse {
+  string path_root = 1;
+  reserved 2; // removed "revision"
+  google.protobuf.Struct path = 3;
+}
+
+message IsRequest {
+  aserto.authorizer.v2.api.PolicyContext policy_context = 1;
+  aserto.authorizer.v2.api.IdentityContext identity_context = 2;
+  google.protobuf.Struct resource_context = 3;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 4 [deprecated = true];
+}
+
+message Decision {
+  string decision = 1;
+  bool is = 2;
+}
+
+message IsResponse {
+  repeated Decision decisions = 1;
+}
+
+message QueryOptions {
+  bool metrics = 1; // default false
+  bool instrument = 2; // default false
+  TraceLevel trace = 3; // default ExplainOffV1
+  bool trace_summary = 4; // default false
+}
+
+message QueryRequest {
+  string query = 1;
+  string input = 2;
+  optional QueryOptions options = 3;
+  optional aserto.authorizer.v2.api.PolicyContext policy_context = 4;
+  optional aserto.authorizer.v2.api.IdentityContext identity_context = 5;
+  optional google.protobuf.Struct resource_context = 6;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 7 [deprecated = true];
+}
+
+message CompileRequest {
+  string query = 1;
+  string input = 2;
+  repeated string unknowns = 3;
+  repeated string disable_inlining = 4;
+  optional QueryOptions options = 5;
+  optional aserto.authorizer.v2.api.PolicyContext policy_context = 6;
+  optional aserto.authorizer.v2.api.IdentityContext identity_context = 7;
+  optional google.protobuf.Struct resource_context = 8;
+  optional aserto.authorizer.v2.api.PolicyInstance policy_instance = 9 [deprecated = true];
+}
+
+message CompileResponse {
+  google.protobuf.Struct result = 1;
+  google.protobuf.Struct metrics = 2;
+  repeated google.protobuf.Struct trace = 3;
+  repeated string trace_summary = 4;
+}
+
+message QueryResponse {
+  google.protobuf.Struct response = 1;
+  google.protobuf.Struct metrics = 2;
+  repeated google.protobuf.Struct trace = 3;
+  repeated string trace_summary = 4;
+}
+
+enum TraceLevel {
+  TRACE_LEVEL_UNKNOWN = 0; // Value not set.
+  TRACE_LEVEL_OFF = 1; // ExplainOffV1   ExplainModeV1 = "off"
+  TRACE_LEVEL_FULL = 2; // ExplainFullV1  ExplainModeV1 = "full"
+  TRACE_LEVEL_NOTES = 3; // ExplainNotesV1 ExplainModeV1 = "notes"
+  TRACE_LEVEL_FAILS = 4; // ExplainFailsV1 ExplainModeV1 = "fails"
+}

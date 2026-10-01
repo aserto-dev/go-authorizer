@@ -10,29 +10,32 @@ GOOS               := $(shell go env GOOS)
 GOARCH             := $(shell go env GOARCH)
 GOPRIVATE          := "github.com/aserto-dev"
 
+BIN_DIR            := ${PWD}/bin
 EXT_DIR            := ${PWD}/.ext
 EXT_BIN_DIR        := ${EXT_DIR}/bin
 EXT_TMP_DIR        := ${EXT_DIR}/tmp
 
-GO_VER             := 1.26
+GO_VER             := 1.27
 SVU_VER            := 3.4.1
 GOTESTSUM_VER      := 1.13.0
-GOLANGCI-LINT_VER  := 2.13.1
-GORELEASER_VER     := 2.17.1
-BUF_VER            := 1.72.0
+GOLANGCI-LINT_VER  := 2.14.0
+GORELEASER_VER     := 2.18.2
+BUF_VER            := 1.73.0
+MERGE-JSON_VER     := 0.1.6
 
 PROJECT            := authorizer
-PROTO_REPO         := pb-${PROJECT}
+PROTO_REPO         := go-${PROJECT}
 BUF_REPO           := buf.build/aserto-dev/${PROJECT}
 BUF_LATEST         := $(shell ${EXT_BIN_DIR}/buf registry module label list ${BUF_REPO} --format json | jq -r '.labels[0].name')
-BUF_DEV_IMAGE      := ../${PROTO_REPO$}/bin/${PROJECT}.bin
+BUF_DEV_IMAGE      := ${BIN_DIR}/${PROJECT}.bin
+GIT_ORG            := "https://github.com/aserto-dev"
 
 RELEASE_TAG        := $$(${EXT_BIN_DIR}/svu current)
 
 .DEFAULT_GOAL      := lint
 
 .PHONY: deps
-deps: info install-buf install-svu install-golangci-lint install-gotestsum
+deps: info install-buf install-svu install-golangci-lint install-gotestsum install-openapi-spec-converter install-merge-json
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 
 .PHONY: gover
@@ -40,12 +43,40 @@ gover:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@(go env GOVERSION | grep "go${GO_VER}") || (echo "go version check failed expected go${GO_VER} got $$(go env GOVERSION)"; exit 1)
 
+PHONY: go-mod-tidy
+go-mod-tidy:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@exit_code=0; \
+	modules=$$(go work edit -json | jq -r '.Use[].DiskPath // empty'); \
+	for mod in $$modules; do \
+		if [ "$$mod" = "." ]; then \
+			mod_dir=$$(pwd); \
+		else \
+			mod_dir=$$(realpath "$$mod" 2>/dev/null || echo "$$mod"); \
+		fi; \
+		echo "go mod tidy $$mod_dir"; \
+		(cd "$$mod_dir" && go mod tidy) || exit_code=$$?; \
+	done; \
+	exit $$exit_code
+
 .PHONY: lint
 lint: gover
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@${EXT_BIN_DIR}/golangci-lint config path
 	@${EXT_BIN_DIR}/golangci-lint config verify
-	@${EXT_BIN_DIR}/golangci-lint run --timeout=30m
+	@exit_code=0; \
+	config=${PWD}/.golangci.yaml; \
+	modules=$$(go work edit -json | jq -r '.Use[].DiskPath // empty'); \
+	for mod in $$modules; do \
+		if [ "$$mod" = "." ]; then \
+			mod_dir=$$(pwd); \
+		else \
+			mod_dir=$$(realpath "$$mod" 2>/dev/null || echo "$$mod"); \
+		fi; \
+		echo -e "$(ATTN_COLOR)==> $@ $$mod_dir$(NO_COLOR)"; \
+		(cd "$$mod_dir" && ${EXT_BIN_DIR}/golangci-lint run --config $$config ./...) || exit_code=$$?; \
+	done; \
+	exit $$exit_code
 
 PHONY: test
 test: gover
@@ -57,20 +88,60 @@ buf-login:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf registry login
 
+.PHONY: buf-dep-update
+buf-dep-update:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf dep update
+
+.PHONY: buf-format
+buf-format:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf format -w proto
+
+.PHONY: buf-build
+buf-build: ${BIN_DIR} buf-format 
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf build --output ${BUF_DEV_IMAGE}
+
+.PHONY: buf-lint
+buf-lint:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf lint
+
+.PHONY: buf-breaking
+buf-breaking:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf breaking --against "${GIT_ORG}/${PROTO_REPO}.git#branch=main"
+
+.PHONY: buf-push
+buf-push:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf push --label ${RELEASE_TAG}
+
 .PHONY: buf-generate
-buf-generate: buf-generate-clean
+buf-generate: buf-clean generate upd-openapi
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+
+.PHONY: buf-generate-dev
+buf-generate-dev: ${BUF_DEV_IMAGE} buf-clean generate-dev upd-openapi
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+
+generate:
 	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_REPO}:${BUF_LATEST}$(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf generate ${BUF_REPO}:${BUF_LATEST}
 
-.PHONY: buf-generate-dev
-buf-generate-dev: ${BUF_DEV_IMAGE} buf-generate-clean
+generate-dev:
 	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_DEV_IMAGE}$(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf generate ${BUF_DEV_IMAGE}
 
-.PHONY: buf-generate-clean
-buf-generate-clean: ./aserto
+upd-openapi:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@rm -rf ./aserto
+	@${PWD}/scripts/upd-openapi.sh
+
+.PHONY: buf-clean
+buf-clean:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@rm -rf ./aserto/authorizer
 
 .PHONY: info
 info:
@@ -124,11 +195,22 @@ install-goreleaser: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
 	@chmod +x ${EXT_BIN_DIR}/goreleaser
 	@${EXT_BIN_DIR}/goreleaser --version
 
+.PHONY: install-openapi-spec-converter
+install-openapi-spec-converter: ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@GOBIN=${EXT_BIN_DIR} go install github.com/dense-analysis/openapi-spec-converter/cmd/openapi-spec-converter@latest
+
+.PHONY: install-merge-json
+install-merge-json: ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@GOBIN=${EXT_BIN_DIR} go install github.com/topaz-authz/merge-json@v${MERGE-JSON_VER}
+
 .PHONY: clean
 clean:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@rm -rf ${EXT_DIR}
 	@rm -rf ${BIN_DIR}
+	@rm -rf ./tmp
 	@rm -rf ./aserto
 
 ${BIN_DIR}:

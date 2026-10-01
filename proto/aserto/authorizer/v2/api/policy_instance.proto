@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package aserto.authorizer.v2.api;
+
+option csharp_namespace = "Aserto.Authorizer.V2.API";
+option go_package = "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api";
+
+// Deprecated: No longer required.
+message PolicyInstance {
+  // policy name
+  string name = 1 [deprecated = true];
+  // label identifying the instance of the policy
+  string instance_label = 2 [deprecated = true];
+}

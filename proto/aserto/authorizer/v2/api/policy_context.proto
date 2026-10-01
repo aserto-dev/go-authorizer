@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package aserto.authorizer.v2.api;
+
+option csharp_namespace = "Aserto.Authorizer.V2.API";
+option go_package = "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api";
+
+message PolicyContext {
+  string path = 1; // policy path aka package name
+  repeated string decisions = 2; // list (1..N) of policy decisions (aka rules)
+}

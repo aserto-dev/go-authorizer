@@ -1,0 +1,776 @@
+{
+  "components": {
+    "schemas": {
+      "apiIdentityContext": {
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/apiIdentityType"
+          }
+        },
+        "type": "object"
+      },
+      "apiIdentityType": {
+        "default": "IDENTITY_TYPE_UNKNOWN",
+        "description": "Identity types, describes the payload type of the identity field inside the IdentityContext message.\n\n - IDENTITY_TYPE_UNKNOWN: Unknown, value not set, requests will fail with identity type not set error.\n - IDENTITY_TYPE_NONE: None, no explicit identity context set, equals anonymous.\n - IDENTITY_TYPE_SUB: Sub(ject), identity field contains an oAUTH subject.\n - IDENTITY_TYPE_JWT: JWT, identity field contains a JWT access token.\n - IDENTITY_TYPE_MANUAL: Manual, propagates thw identity field as-is, without validation, into the input object.",
+        "enum": [
+          "IDENTITY_TYPE_UNKNOWN",
+          "IDENTITY_TYPE_NONE",
+          "IDENTITY_TYPE_SUB",
+          "IDENTITY_TYPE_JWT",
+          "IDENTITY_TYPE_MANUAL"
+        ],
+        "type": "string"
+      },
+      "apiModule": {
+        "properties": {
+          "ast": {},
+          "id": {
+            "type": "string"
+          },
+          "package_path": {
+            "type": "string"
+          },
+          "package_root": {
+            "type": "string"
+          },
+          "raw": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "apiPolicyContext": {
+        "properties": {
+          "decisions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "list (1..N) of policy decisions (aka rules)",
+            "type": "array"
+          },
+          "path": {
+            "title": "policy path aka package name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "apiPolicyInstance": {
+        "description": "Deprecated: No longer required.",
+        "properties": {
+          "instance_label": {
+            "title": "label identifying the instance of the policy",
+            "type": "string"
+          },
+          "name": {
+            "title": "policy name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "authorizerV2Decision": {
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "is": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "protobufAny": {
+        "additionalProperties": {},
+        "properties": {
+          "@type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "protobufNullValue": {
+        "default": "NULL_VALUE",
+        "description": "Represents a JSON `null`.\n\n`NullValue` is a sentinel, using an enum with only one value to represent\nthe null value for the `Value` type union.\n\nA field of type `NullValue` with any value other than `0` is considered\ninvalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\nas a JSON `null` regardless of the integer value, and so will round trip to\na `0` value.\n\n - NULL_VALUE: Null value.",
+        "enum": [
+          "NULL_VALUE"
+        ],
+        "type": "string"
+      },
+      "rpcStatus": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/protobufAny"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "v2CompileRequest": {
+        "properties": {
+          "disable_inlining": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "identity_context": {
+            "$ref": "#/components/schemas/apiIdentityContext"
+          },
+          "input": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/v2QueryOptions"
+          },
+          "policy_context": {
+            "$ref": "#/components/schemas/apiPolicyContext"
+          },
+          "policy_instance": {
+            "$ref": "#/components/schemas/apiPolicyInstance"
+          },
+          "query": {
+            "type": "string"
+          },
+          "resource_context": {
+            "type": "object"
+          },
+          "unknowns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "v2CompileResponse": {
+        "properties": {
+          "metrics": {
+            "type": "object"
+          },
+          "result": {
+            "type": "object"
+          },
+          "trace": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "trace_summary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "v2DecisionTreeOptions": {
+        "properties": {
+          "path_separator": {
+            "$ref": "#/components/schemas/v2PathSeparator"
+          }
+        },
+        "type": "object"
+      },
+      "v2DecisionTreeRequest": {
+        "properties": {
+          "identity_context": {
+            "$ref": "#/components/schemas/apiIdentityContext"
+          },
+          "options": {
+            "$ref": "#/components/schemas/v2DecisionTreeOptions"
+          },
+          "policy_context": {
+            "$ref": "#/components/schemas/apiPolicyContext"
+          },
+          "policy_instance": {
+            "$ref": "#/components/schemas/apiPolicyInstance"
+          },
+          "resource_context": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "v2DecisionTreeResponse": {
+        "properties": {
+          "path": {
+            "type": "object"
+          },
+          "path_root": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "v2GetPolicyResponse": {
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/apiModule"
+          }
+        },
+        "type": "object"
+      },
+      "v2InfoResponse": {
+        "properties": {
+          "arch": {
+            "type": "string"
+          },
+          "commit": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "os": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "v2IsRequest": {
+        "properties": {
+          "identity_context": {
+            "$ref": "#/components/schemas/apiIdentityContext"
+          },
+          "policy_context": {
+            "$ref": "#/components/schemas/apiPolicyContext"
+          },
+          "policy_instance": {
+            "$ref": "#/components/schemas/apiPolicyInstance"
+          },
+          "resource_context": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "v2IsResponse": {
+        "properties": {
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/authorizerV2Decision"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "v2ListPoliciesResponse": {
+        "properties": {
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/apiModule"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "v2PathSeparator": {
+        "default": "PATH_SEPARATOR_UNKNOWN",
+        "description": "- PATH_SEPARATOR_UNKNOWN: Value not set.\n - PATH_SEPARATOR_DOT: Dot \".\" path separator\n - PATH_SEPARATOR_SLASH: Slash \"/\" path separator",
+        "enum": [
+          "PATH_SEPARATOR_UNKNOWN",
+          "PATH_SEPARATOR_DOT",
+          "PATH_SEPARATOR_SLASH"
+        ],
+        "type": "string"
+      },
+      "v2QueryOptions": {
+        "properties": {
+          "instrument": {
+            "title": "default false",
+            "type": "boolean"
+          },
+          "metrics": {
+            "title": "default false",
+            "type": "boolean"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/v2TraceLevel"
+          },
+          "trace_summary": {
+            "title": "default false",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "v2QueryRequest": {
+        "properties": {
+          "identity_context": {
+            "$ref": "#/components/schemas/apiIdentityContext"
+          },
+          "input": {
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/v2QueryOptions"
+          },
+          "policy_context": {
+            "$ref": "#/components/schemas/apiPolicyContext"
+          },
+          "policy_instance": {
+            "$ref": "#/components/schemas/apiPolicyInstance"
+          },
+          "query": {
+            "type": "string"
+          },
+          "resource_context": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "v2QueryResponse": {
+        "properties": {
+          "metrics": {
+            "type": "object"
+          },
+          "response": {
+            "type": "object"
+          },
+          "trace": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "trace_summary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "v2TraceLevel": {
+        "default": "TRACE_LEVEL_UNKNOWN",
+        "description": "- TRACE_LEVEL_UNKNOWN: Value not set.\n - TRACE_LEVEL_OFF: ExplainOffV1   ExplainModeV1 = \"off\"\n - TRACE_LEVEL_FULL: ExplainFullV1  ExplainModeV1 = \"full\"\n - TRACE_LEVEL_NOTES: ExplainNotesV1 ExplainModeV1 = \"notes\"\n - TRACE_LEVEL_FAILS: ExplainFailsV1 ExplainModeV1 = \"fails\"",
+        "enum": [
+          "TRACE_LEVEL_UNKNOWN",
+          "TRACE_LEVEL_OFF",
+          "TRACE_LEVEL_FULL",
+          "TRACE_LEVEL_NOTES",
+          "TRACE_LEVEL_FAILS"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "AuthorizerAPIKey": {
+        "in": "header",
+        "name": "authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Authorizer API Reference.",
+    "url": "https://github.com/aserto-dev/pb-authorizer/blob/main/html/index.html"
+  },
+  "info": {
+    "contact": {
+      "email": "support@aserto.com",
+      "name": "Aserto, Inc.",
+      "url": "https://github.com/aserto-dev/pb-authorizer"
+    },
+    "license": {
+      "name": "Apache 2.0 License",
+      "url": "https://github.com/aserto-dev/pb-authorizer/blob/main/LICENSE"
+    },
+    "title": "Authorizer Service",
+    "version": "2.1"
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/api/v2/authz/compile": {
+      "post": {
+        "description": "Executes a partial query on the loaded policy runtime.",
+        "operationId": "authorizer.compile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v2CompileRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2CompileResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "Compile",
+        "tags": [
+          "Authorizer"
+        ]
+      }
+    },
+    "/api/v2/authz/decisiontree": {
+      "post": {
+        "description": "Returns decision tree for given identity context.",
+        "operationId": "authorizer.decision_tree",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v2DecisionTreeRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2DecisionTreeResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "Decision tree",
+        "tags": [
+          "Authorizer"
+        ]
+      }
+    },
+    "/api/v2/authz/is": {
+      "post": {
+        "description": "Determines if identity context is authorized to access the resource guarded by the given policy.",
+        "operationId": "authorizer.is",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v2IsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2IsResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "Is (authorized)",
+        "tags": [
+          "Authorizer"
+        ]
+      }
+    },
+    "/api/v2/authz/query": {
+      "post": {
+        "description": "Executes a rego query on the loaded policy runtime.",
+        "operationId": "authorizer.query",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/v2QueryRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2QueryResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "Query",
+        "tags": [
+          "Authorizer"
+        ]
+      }
+    },
+    "/api/v2/info": {
+      "get": {
+        "description": "Return version information.",
+        "operationId": "info.get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2InfoResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [],
+        "summary": "Info",
+        "tags": [
+          "Info"
+        ]
+      }
+    },
+    "/api/v2/policies": {
+      "get": {
+        "description": "Lists the policy modules for the policy bundle.",
+        "operationId": "policies.list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "field_mask",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "policy name",
+            "in": "query",
+            "name": "policy_instance.name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "label identifying the instance of the policy",
+            "in": "query",
+            "name": "policy_instance.instance_label",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2ListPoliciesResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "List Policies",
+        "tags": [
+          "Policy"
+        ]
+      }
+    },
+    "/api/v2/policies/{id}": {
+      "get": {
+        "description": "Gets the policy modules for the given module Id.",
+        "operationId": "policies.get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "pattern": "[^/]+/.+",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "field_mask",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "policy name",
+            "in": "query",
+            "name": "policy_instance.name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "label identifying the instance of the policy",
+            "in": "query",
+            "name": "policy_instance.instance_label",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v2GetPolicyResponse"
+                }
+              }
+            },
+            "description": "A successful response."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rpcStatus"
+                }
+              }
+            },
+            "description": "An unexpected error response."
+          }
+        },
+        "security": [
+          {
+            "AuthorizerAPIKey": []
+          }
+        ],
+        "summary": "Get Policy",
+        "tags": [
+          "Policy"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "AuthorizerAPIKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authorizer"
+    }
+  ]
+}

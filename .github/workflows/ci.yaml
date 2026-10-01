@@ -18,8 +18,8 @@ on:
 
 env:
   BUF_REPO: "buf.build/aserto-dev/authorizer"
-  BUF_VER: 1.72.0
-  GO_LANGCI_LINT_VER: "v2.13.1"
+  BUF_VER: 1.73.0
+  GO_LANGCI_LINT_VER: 2.14.0
 
 jobs:
   build:
@@ -71,7 +71,7 @@ jobs:
         name: Lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: ${{ env.GO_LANGCI_LINT_VER }}
+          version: v${{ env.GO_LANGCI_LINT_VER }}
           args: --timeout=5m
       -
         name: Test
@@ -80,7 +80,7 @@ jobs:
       -
         name: Commit changes
         if: github.event_name == 'workflow_dispatch'
-        uses: EndBug/add-and-commit@v11
+        uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
           add: 'aserto'

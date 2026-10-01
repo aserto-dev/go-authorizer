@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package aserto.authorizer.v2.api;
+
+import "aserto/authorizer/v2/api/identity_context.proto";
+import "aserto/authorizer/v2/api/policy_context.proto";
+import "aserto/authorizer/v2/api/policy_instance.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Aserto.Authorizer.V2.API";
+option go_package = "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api;api";
+
+// represents a decision that an authorizer performed in the past
+message Decision {
+  reserved 9;
+  reserved "tenant_id";
+
+  string id = 1; // unique id, replay a decision starting with this, also useful to de-dup
+  google.protobuf.Timestamp timestamp = 2; // UTC time when the decision was made
+  string path = 3; // Policy path used in decision
+  DecisionUser user = 4; // info about user for whom the decision as made
+  DecisionPolicy policy = 5; // info about policy used for the decision
+  map<string, bool> outcomes = 6; // outcome of the decisions specified in the policy context
+  google.protobuf.Struct resource = 7; // the resource context used in a decision
+  map<string, string> annotations = 8; // annotations that may be added to a decision
+}
+
+// information about a user on behalf of whom a decision was made
+message DecisionUser {
+  aserto.authorizer.v2.api.IdentityContext context = 1; // identity context used in the decision
+  string id = 2; // id of the user the identity resolved to
+  string email = 3; // convenience human-readable identifier
+}
+
+// information about a policy used in a decision
+message DecisionPolicy {
+  aserto.authorizer.v2.api.PolicyContext context = 1; // policy context used in the decision
+  string registry_service = 2; // registry service where policy was retrieved from (e.g. opcr.io)
+  string registry_image = 3; // image of the policy in the registry, including org (e.g. acmecorp/peoplefinder-abac)
+  string registry_tag = 4; // tag of the policy image (e.g. 0.8.2 or latest)
+  string registry_digest = 5; // digest of the policy image
+  aserto.authorizer.v2.api.PolicyInstance policy_instance = 6 [deprecated = true]; // policy instance used in decision
+}
