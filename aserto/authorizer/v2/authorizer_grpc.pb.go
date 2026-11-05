@@ -32,6 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorizerClient interface {
+	// Deprecated: Do not use.
 	DecisionTree(ctx context.Context, in *DecisionTreeRequest, opts ...grpc.CallOption) (*DecisionTreeResponse, error)
 	Is(ctx context.Context, in *IsRequest, opts ...grpc.CallOption) (*IsResponse, error)
 	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
@@ -49,6 +50,7 @@ func NewAuthorizerClient(cc grpc.ClientConnInterface) AuthorizerClient {
 	return &authorizerClient{cc}
 }
 
+// Deprecated: Do not use.
 func (c *authorizerClient) DecisionTree(ctx context.Context, in *DecisionTreeRequest, opts ...grpc.CallOption) (*DecisionTreeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DecisionTreeResponse)
@@ -123,6 +125,7 @@ func (c *authorizerClient) Info(ctx context.Context, in *InfoRequest, opts ...gr
 // All implementations should embed UnimplementedAuthorizerServer
 // for forward compatibility.
 type AuthorizerServer interface {
+	// Deprecated: Do not use.
 	DecisionTree(context.Context, *DecisionTreeRequest) (*DecisionTreeResponse, error)
 	Is(context.Context, *IsRequest) (*IsResponse, error)
 	Query(context.Context, *QueryRequest) (*QueryResponse, error)

@@ -8,7 +8,7 @@ package authorizer
 
 import (
 	api "github.com/aserto-dev/go-authorizer/aserto/authorizer/v2/api"
-	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
+	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv3/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -245,9 +245,9 @@ func (x *InfoResponse) GetArch() string {
 type GetPolicyRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=field_mask,proto3" json:"field_mask,omitempty"`
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,3,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,3,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -350,9 +350,9 @@ func (x *GetPolicyResponse) GetResult() *api.Module {
 
 type ListPoliciesRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
-	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,1,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,1,opt,name=field_mask,proto3" json:"field_mask,omitempty"`
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,2,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,2,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -447,13 +447,19 @@ func (x *ListPoliciesResponse) GetResult() []*api.Module {
 }
 
 type DecisionTreeRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	PolicyContext   *api.PolicyContext     `protobuf:"bytes,1,opt,name=policy_context,json=policyContext,proto3" json:"policy_context,omitempty"`
-	IdentityContext *api.IdentityContext   `protobuf:"bytes,2,opt,name=identity_context,json=identityContext,proto3" json:"identity_context,omitempty"`
-	Options         *DecisionTreeOptions   `protobuf:"bytes,3,opt,name=options,proto3" json:"options,omitempty"`
-	ResourceContext *structpb.Struct       `protobuf:"bytes,4,opt,name=resource_context,json=resourceContext,proto3" json:"resource_context,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// policy context
+	PolicyContext *api.PolicyContext `protobuf:"bytes,1,opt,name=policy_context,proto3" json:"policy_context,omitempty"`
+	// identity context
+	IdentityContext *api.IdentityContext `protobuf:"bytes,2,opt,name=identity_context,proto3" json:"identity_context,omitempty"`
+	// decision tree options
+	Options *DecisionTreeOptions `protobuf:"bytes,3,opt,name=options,proto3" json:"options,omitempty"`
+	// resource context
+	ResourceContext *structpb.Struct `protobuf:"bytes,4,opt,name=resource_context,proto3" json:"resource_context,omitempty"`
+	// policy instance
+	//
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,5,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,5,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -621,12 +627,17 @@ func (x *DecisionTreeResponse) GetPath() *structpb.Struct {
 }
 
 type IsRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	PolicyContext   *api.PolicyContext     `protobuf:"bytes,1,opt,name=policy_context,json=policyContext,proto3" json:"policy_context,omitempty"`
-	IdentityContext *api.IdentityContext   `protobuf:"bytes,2,opt,name=identity_context,json=identityContext,proto3" json:"identity_context,omitempty"`
-	ResourceContext *structpb.Struct       `protobuf:"bytes,3,opt,name=resource_context,json=resourceContext,proto3" json:"resource_context,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// policy context
+	PolicyContext *api.PolicyContext `protobuf:"bytes,1,opt,name=policy_context,proto3" json:"policy_context,omitempty"`
+	// identity context
+	IdentityContext *api.IdentityContext `protobuf:"bytes,2,opt,name=identity_context,proto3" json:"identity_context,omitempty"`
+	// resource context
+	ResourceContext *structpb.Struct `protobuf:"bytes,3,opt,name=resource_context,proto3" json:"resource_context,omitempty"`
+	// policy instance
+	//
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,4,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,4,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -691,9 +702,11 @@ func (x *IsRequest) GetPolicyInstance() *api.PolicyInstance {
 }
 
 type Decision struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Decision      string                 `protobuf:"bytes,1,opt,name=decision,proto3" json:"decision,omitempty"`
-	Is            bool                   `protobuf:"varint,2,opt,name=is,proto3" json:"is,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// decision
+	Decision string `protobuf:"bytes,1,opt,name=decision,proto3" json:"decision,omitempty"`
+	// is (decision outcome)
+	Is            bool `protobuf:"varint,2,opt,name=is,json=ise,proto3" json:"is,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -743,8 +756,9 @@ func (x *Decision) GetIs() bool {
 }
 
 type IsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Decisions     []*Decision            `protobuf:"bytes,1,rep,name=decisions,proto3" json:"decisions,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// decisions
+	Decisions     []*Decision `protobuf:"bytes,1,rep,name=decisions,proto3" json:"decisions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -787,11 +801,15 @@ func (x *IsResponse) GetDecisions() []*Decision {
 }
 
 type QueryOptions struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Metrics       bool                   `protobuf:"varint,1,opt,name=metrics,proto3" json:"metrics,omitempty"`                                  // default false
-	Instrument    bool                   `protobuf:"varint,2,opt,name=instrument,proto3" json:"instrument,omitempty"`                            // default false
-	Trace         TraceLevel             `protobuf:"varint,3,opt,name=trace,proto3,enum=aserto.authorizer.v2.TraceLevel" json:"trace,omitempty"` // default ExplainOffV1
-	TraceSummary  bool                   `protobuf:"varint,4,opt,name=trace_summary,json=traceSummary,proto3" json:"trace_summary,omitempty"`    // default false
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// metrics (default false)
+	Metrics bool `protobuf:"varint,1,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	// instrument (default false)
+	Instrument bool `protobuf:"varint,2,opt,name=instrument,proto3" json:"instrument,omitempty"` // default false
+	// trace level (default ExplainOffV1)
+	Trace TraceLevel `protobuf:"varint,3,opt,name=trace,proto3,enum=aserto.authorizer.v2.TraceLevel" json:"trace,omitempty"`
+	// trace summary (default false)
+	TraceSummary  bool `protobuf:"varint,4,opt,name=trace_summary,proto3" json:"trace_summary,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -855,15 +873,23 @@ func (x *QueryOptions) GetTraceSummary() bool {
 }
 
 type QueryRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Query           string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Input           string                 `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
-	Options         *QueryOptions          `protobuf:"bytes,3,opt,name=options,proto3,oneof" json:"options,omitempty"`
-	PolicyContext   *api.PolicyContext     `protobuf:"bytes,4,opt,name=policy_context,json=policyContext,proto3,oneof" json:"policy_context,omitempty"`
-	IdentityContext *api.IdentityContext   `protobuf:"bytes,5,opt,name=identity_context,json=identityContext,proto3,oneof" json:"identity_context,omitempty"`
-	ResourceContext *structpb.Struct       `protobuf:"bytes,6,opt,name=resource_context,json=resourceContext,proto3,oneof" json:"resource_context,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// query
+	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	// query input block
+	Input string `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
+	// query options
+	Options *QueryOptions `protobuf:"bytes,3,opt,name=options,proto3,oneof" json:"options,omitempty"`
+	// policy context
+	PolicyContext *api.PolicyContext `protobuf:"bytes,4,opt,name=policy_context,proto3,oneof" json:"policy_context,omitempty"`
+	// identity context
+	IdentityContext *api.IdentityContext `protobuf:"bytes,5,opt,name=identity_context,proto3,oneof" json:"identity_context,omitempty"`
+	// resource context
+	ResourceContext *structpb.Struct `protobuf:"bytes,6,opt,name=resource_context,proto3,oneof" json:"resource_context,omitempty"`
+	// policy instance
+	//
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,7,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,7,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -948,25 +974,107 @@ func (x *QueryRequest) GetPolicyInstance() *api.PolicyInstance {
 	return nil
 }
 
+type QueryResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// query response
+	Response *structpb.Struct `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
+	// metrics
+	Metrics *structpb.Struct `protobuf:"bytes,2,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	// trace
+	Trace []*structpb.Struct `protobuf:"bytes,3,rep,name=trace,proto3" json:"trace,omitempty"`
+	// trace summary
+	TraceSummary  []string `protobuf:"bytes,4,rep,name=trace_summary,proto3" json:"trace_summary,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *QueryResponse) Reset() {
+	*x = QueryResponse{}
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QueryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryResponse) ProtoMessage() {}
+
+func (x *QueryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryResponse.ProtoReflect.Descriptor instead.
+func (*QueryResponse) Descriptor() ([]byte, []int) {
+	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *QueryResponse) GetResponse() *structpb.Struct {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+func (x *QueryResponse) GetMetrics() *structpb.Struct {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
+func (x *QueryResponse) GetTrace() []*structpb.Struct {
+	if x != nil {
+		return x.Trace
+	}
+	return nil
+}
+
+func (x *QueryResponse) GetTraceSummary() []string {
+	if x != nil {
+		return x.TraceSummary
+	}
+	return nil
+}
+
 type CompileRequest struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Query           string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Input           string                 `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
-	Unknowns        []string               `protobuf:"bytes,3,rep,name=unknowns,proto3" json:"unknowns,omitempty"`
-	DisableInlining []string               `protobuf:"bytes,4,rep,name=disable_inlining,json=disableInlining,proto3" json:"disable_inlining,omitempty"`
-	Options         *QueryOptions          `protobuf:"bytes,5,opt,name=options,proto3,oneof" json:"options,omitempty"`
-	PolicyContext   *api.PolicyContext     `protobuf:"bytes,6,opt,name=policy_context,json=policyContext,proto3,oneof" json:"policy_context,omitempty"`
-	IdentityContext *api.IdentityContext   `protobuf:"bytes,7,opt,name=identity_context,json=identityContext,proto3,oneof" json:"identity_context,omitempty"`
-	ResourceContext *structpb.Struct       `protobuf:"bytes,8,opt,name=resource_context,json=resourceContext,proto3,oneof" json:"resource_context,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// query
+	Query string `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	// input block
+	Input string `protobuf:"bytes,2,opt,name=input,proto3" json:"input,omitempty"`
+	// unknowns
+	Unknowns []string `protobuf:"bytes,3,rep,name=unknowns,proto3" json:"unknowns,omitempty"`
+	// disable inlining
+	DisableInlining []string `protobuf:"bytes,4,rep,name=disable_inlining,proto3" json:"disable_inlining,omitempty"`
+	// query options
+	Options *QueryOptions `protobuf:"bytes,5,opt,name=options,proto3,oneof" json:"options,omitempty"`
+	// policy context
+	PolicyContext *api.PolicyContext `protobuf:"bytes,6,opt,name=policy_context,proto3,oneof" json:"policy_context,omitempty"`
+	// identity context
+	IdentityContext *api.IdentityContext `protobuf:"bytes,7,opt,name=identity_context,proto3,oneof" json:"identity_context,omitempty"`
+	// resource context
+	ResourceContext *structpb.Struct `protobuf:"bytes,8,opt,name=resource_context,proto3,oneof" json:"resource_context,omitempty"`
+	// policy instance
+	//
 	// Deprecated: Marked as deprecated in aserto/authorizer/v2/authorizer.proto.
-	PolicyInstance *api.PolicyInstance `protobuf:"bytes,9,opt,name=policy_instance,json=policyInstance,proto3,oneof" json:"policy_instance,omitempty"`
+	PolicyInstance *api.PolicyInstance `protobuf:"bytes,9,opt,name=policy_instance,proto3,oneof" json:"policy_instance,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CompileRequest) Reset() {
 	*x = CompileRequest{}
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[14]
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -978,7 +1086,7 @@ func (x *CompileRequest) String() string {
 func (*CompileRequest) ProtoMessage() {}
 
 func (x *CompileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[14]
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -991,7 +1099,7 @@ func (x *CompileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompileRequest.ProtoReflect.Descriptor instead.
 func (*CompileRequest) Descriptor() ([]byte, []int) {
-	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{14}
+	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CompileRequest) GetQuery() string {
@@ -1063,14 +1171,14 @@ type CompileResponse struct {
 	Result        *structpb.Struct       `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 	Metrics       *structpb.Struct       `protobuf:"bytes,2,opt,name=metrics,proto3" json:"metrics,omitempty"`
 	Trace         []*structpb.Struct     `protobuf:"bytes,3,rep,name=trace,proto3" json:"trace,omitempty"`
-	TraceSummary  []string               `protobuf:"bytes,4,rep,name=trace_summary,json=traceSummary,proto3" json:"trace_summary,omitempty"`
+	TraceSummary  []string               `protobuf:"bytes,4,rep,name=trace_summary,proto3" json:"trace_summary,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CompileResponse) Reset() {
 	*x = CompileResponse{}
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[15]
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1082,7 +1190,7 @@ func (x *CompileResponse) String() string {
 func (*CompileResponse) ProtoMessage() {}
 
 func (x *CompileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[15]
+	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1095,7 +1203,7 @@ func (x *CompileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompileResponse.ProtoReflect.Descriptor instead.
 func (*CompileResponse) Descriptor() ([]byte, []int) {
-	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{15}
+	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CompileResponse) GetResult() *structpb.Struct {
@@ -1126,172 +1234,106 @@ func (x *CompileResponse) GetTraceSummary() []string {
 	return nil
 }
 
-type QueryResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Response      *structpb.Struct       `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
-	Metrics       *structpb.Struct       `protobuf:"bytes,2,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	Trace         []*structpb.Struct     `protobuf:"bytes,3,rep,name=trace,proto3" json:"trace,omitempty"`
-	TraceSummary  []string               `protobuf:"bytes,4,rep,name=trace_summary,json=traceSummary,proto3" json:"trace_summary,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *QueryResponse) Reset() {
-	*x = QueryResponse{}
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *QueryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*QueryResponse) ProtoMessage() {}
-
-func (x *QueryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_aserto_authorizer_v2_authorizer_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use QueryResponse.ProtoReflect.Descriptor instead.
-func (*QueryResponse) Descriptor() ([]byte, []int) {
-	return file_aserto_authorizer_v2_authorizer_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *QueryResponse) GetResponse() *structpb.Struct {
-	if x != nil {
-		return x.Response
-	}
-	return nil
-}
-
-func (x *QueryResponse) GetMetrics() *structpb.Struct {
-	if x != nil {
-		return x.Metrics
-	}
-	return nil
-}
-
-func (x *QueryResponse) GetTrace() []*structpb.Struct {
-	if x != nil {
-		return x.Trace
-	}
-	return nil
-}
-
-func (x *QueryResponse) GetTraceSummary() []string {
-	if x != nil {
-		return x.TraceSummary
-	}
-	return nil
-}
-
 var File_aserto_authorizer_v2_authorizer_proto protoreflect.FileDescriptor
 
 const file_aserto_authorizer_v2_authorizer_proto_rawDesc = "" +
 	"\n" +
-	"%aserto/authorizer/v2/authorizer.proto\x12\x14aserto.authorizer.v2\x1a/aserto/authorizer/v2/api/identity_context.proto\x1a%aserto/authorizer/v2/api/module.proto\x1a-aserto/authorizer/v2/api/policy_context.proto\x1a.aserto/authorizer/v2/api/policy_instance.proto\x1a\x1cgoogle/api/annotations.proto\x1a google/protobuf/field_mask.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"\r\n" +
+	"%aserto/authorizer/v2/authorizer.proto\x12\x14aserto.authorizer.v2\x1a\"aserto/authorizer/v2/api/api.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a google/protobuf/field_mask.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a.protoc-gen-openapiv3/options/annotations.proto\"\r\n" +
 	"\vInfoRequest\"x\n" +
 	"\fInfoResponse\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x16\n" +
 	"\x06commit\x18\x02 \x01(\tR\x06commit\x12\x12\n" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12\x0e\n" +
 	"\x02os\x18\x04 \x01(\tR\x02os\x12\x12\n" +
-	"\x04arch\x18\x05 \x01(\tR\x04arch\"\xcd\x01\n" +
-	"\x10GetPolicyRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
+	"\x04arch\x18\x05 \x01(\tR\x04arch\"\xe3\x01\n" +
+	"\x10GetPolicyRequest\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tB\x06\xe2A\x01\x02\x18\x00R\x02id\x12B\n" +
 	"\n" +
-	"field_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskR\tfieldMask\x12Z\n" +
-	"\x0fpolicy_instance\x18\x03 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x00R\x0epolicyInstance\x88\x01\x01B\x12\n" +
-	"\x10_policy_instance\"M\n" +
-	"\x11GetPolicyResponse\x128\n" +
-	"\x06result\x18\x01 \x01(\v2 .aserto.authorizer.v2.api.ModuleR\x06result\"\xc0\x01\n" +
-	"\x13ListPoliciesRequest\x129\n" +
+	"field_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x06\xe2A\x01\x01\x18\x00R\n" +
+	"field_mask\x12_\n" +
+	"\x0fpolicy_instance\x18\x03 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x00R\x0fpolicy_instance\x88\x01\x01B\x12\n" +
+	"\x10_policy_instance\"U\n" +
+	"\x11GetPolicyResponse\x12@\n" +
+	"\x06result\x18\x01 \x01(\v2 .aserto.authorizer.v2.api.ModuleB\x06\xe2A\x01\x03\x18\x00R\x06result\"\xce\x01\n" +
+	"\x13ListPoliciesRequest\x12B\n" +
 	"\n" +
-	"field_mask\x18\x01 \x01(\v2\x1a.google.protobuf.FieldMaskR\tfieldMask\x12Z\n" +
-	"\x0fpolicy_instance\x18\x02 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x00R\x0epolicyInstance\x88\x01\x01B\x12\n" +
-	"\x10_policy_instance\"P\n" +
-	"\x14ListPoliciesResponse\x128\n" +
-	"\x06result\x18\x01 \x03(\v2 .aserto.authorizer.v2.api.ModuleR\x06result\"\xb4\x03\n" +
-	"\x13DecisionTreeRequest\x12N\n" +
-	"\x0epolicy_context\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextR\rpolicyContext\x12T\n" +
-	"\x10identity_context\x18\x02 \x01(\v2).aserto.authorizer.v2.api.IdentityContextR\x0fidentityContext\x12C\n" +
-	"\aoptions\x18\x03 \x01(\v2).aserto.authorizer.v2.DecisionTreeOptionsR\aoptions\x12B\n" +
-	"\x10resource_context\x18\x04 \x01(\v2\x17.google.protobuf.StructR\x0fresourceContext\x12Z\n" +
-	"\x0fpolicy_instance\x18\x05 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x00R\x0epolicyInstance\x88\x01\x01B\x12\n" +
+	"field_mask\x18\x01 \x01(\v2\x1a.google.protobuf.FieldMaskB\x06\xe2A\x01\x01\x18\x00R\n" +
+	"field_mask\x12_\n" +
+	"\x0fpolicy_instance\x18\x02 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x00R\x0fpolicy_instance\x88\x01\x01B\x12\n" +
+	"\x10_policy_instance\"X\n" +
+	"\x14ListPoliciesResponse\x12@\n" +
+	"\x06result\x18\x01 \x03(\v2 .aserto.authorizer.v2.api.ModuleB\x06\xe2A\x01\x03\x18\x00R\x06result\"\xdc\x03\n" +
+	"\x13DecisionTreeRequest\x12W\n" +
+	"\x0epolicy_context\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextB\x06\xe2A\x01\x02\x18\x00R\x0epolicy_context\x12]\n" +
+	"\x10identity_context\x18\x02 \x01(\v2).aserto.authorizer.v2.api.IdentityContextB\x06\xe2A\x01\x02\x18\x00R\x10identity_context\x12K\n" +
+	"\aoptions\x18\x03 \x01(\v2).aserto.authorizer.v2.DecisionTreeOptionsB\x06\xe2A\x01\x01\x18\x00R\aoptions\x12K\n" +
+	"\x10resource_context\x18\x04 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x01\x18\x00R\x10resource_context\x12_\n" +
+	"\x0fpolicy_instance\x18\x05 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x00R\x0fpolicy_instance\x88\x01\x01B\x12\n" +
 	"\x10_policy_instance\"g\n" +
 	"\x13DecisionTreeOptions\x12J\n" +
 	"\x0epath_separator\x18\x01 \x01(\x0e2#.aserto.authorizer.v2.PathSeparatorR\rpathSeparatorJ\x04\b\x02\x10\x03\"f\n" +
 	"\x14DecisionTreeResponse\x12\x1b\n" +
 	"\tpath_root\x18\x01 \x01(\tR\bpathRoot\x12+\n" +
-	"\x04path\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x04pathJ\x04\b\x02\x10\x03\"\xe5\x02\n" +
-	"\tIsRequest\x12N\n" +
-	"\x0epolicy_context\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextR\rpolicyContext\x12T\n" +
-	"\x10identity_context\x18\x02 \x01(\v2).aserto.authorizer.v2.api.IdentityContextR\x0fidentityContext\x12B\n" +
-	"\x10resource_context\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x0fresourceContext\x12Z\n" +
-	"\x0fpolicy_instance\x18\x04 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x00R\x0epolicyInstance\x88\x01\x01B\x12\n" +
-	"\x10_policy_instance\"6\n" +
-	"\bDecision\x12\x1a\n" +
-	"\bdecision\x18\x01 \x01(\tR\bdecision\x12\x0e\n" +
-	"\x02is\x18\x02 \x01(\bR\x02is\"J\n" +
+	"\x04path\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x04pathJ\x04\b\x02\x10\x03\"\x85\x03\n" +
+	"\tIsRequest\x12W\n" +
+	"\x0epolicy_context\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextB\x06\xe2A\x01\x02\x18\x00R\x0epolicy_context\x12]\n" +
+	"\x10identity_context\x18\x02 \x01(\v2).aserto.authorizer.v2.api.IdentityContextB\x06\xe2A\x01\x02\x18\x00R\x10identity_context\x12K\n" +
+	"\x10resource_context\x18\x03 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x01\x18\x00R\x10resource_context\x12_\n" +
+	"\x0fpolicy_instance\x18\x04 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x00R\x0fpolicy_instance\x88\x01\x01B\x12\n" +
+	"\x10_policy_instance\"G\n" +
+	"\bDecision\x12\"\n" +
+	"\bdecision\x18\x01 \x01(\tB\x06\xe2A\x01\x03\x18\x00R\bdecision\x12\x17\n" +
+	"\x02is\x18\x02 \x01(\bB\x06\xe2A\x01\x03\x18\x00R\x03ise\"R\n" +
 	"\n" +
-	"IsResponse\x12<\n" +
-	"\tdecisions\x18\x01 \x03(\v2\x1e.aserto.authorizer.v2.DecisionR\tdecisions\"\xa5\x01\n" +
-	"\fQueryOptions\x12\x18\n" +
-	"\ametrics\x18\x01 \x01(\bR\ametrics\x12\x1e\n" +
+	"IsResponse\x12D\n" +
+	"\tdecisions\x18\x01 \x03(\v2\x1e.aserto.authorizer.v2.DecisionB\x06\xe2A\x01\x03\x18\x00R\tdecisions\"\xc6\x01\n" +
+	"\fQueryOptions\x12 \n" +
+	"\ametrics\x18\x01 \x01(\bB\x06\xe2A\x01\x01\x18\x00R\ametrics\x12&\n" +
 	"\n" +
-	"instrument\x18\x02 \x01(\bR\n" +
-	"instrument\x126\n" +
-	"\x05trace\x18\x03 \x01(\x0e2 .aserto.authorizer.v2.TraceLevelR\x05trace\x12#\n" +
-	"\rtrace_summary\x18\x04 \x01(\bR\ftraceSummary\"\xaf\x04\n" +
-	"\fQueryRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
-	"\x05input\x18\x02 \x01(\tR\x05input\x12A\n" +
-	"\aoptions\x18\x03 \x01(\v2\".aserto.authorizer.v2.QueryOptionsH\x00R\aoptions\x88\x01\x01\x12S\n" +
-	"\x0epolicy_context\x18\x04 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextH\x01R\rpolicyContext\x88\x01\x01\x12Y\n" +
-	"\x10identity_context\x18\x05 \x01(\v2).aserto.authorizer.v2.api.IdentityContextH\x02R\x0fidentityContext\x88\x01\x01\x12G\n" +
-	"\x10resource_context\x18\x06 \x01(\v2\x17.google.protobuf.StructH\x03R\x0fresourceContext\x88\x01\x01\x12Z\n" +
-	"\x0fpolicy_instance\x18\a \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x04R\x0epolicyInstance\x88\x01\x01B\n" +
-	"\n" +
-	"\b_optionsB\x11\n" +
-	"\x0f_policy_contextB\x13\n" +
-	"\x11_identity_contextB\x13\n" +
-	"\x11_resource_contextB\x12\n" +
-	"\x10_policy_instance\"\xf8\x04\n" +
-	"\x0eCompileRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
-	"\x05input\x18\x02 \x01(\tR\x05input\x12\x1a\n" +
-	"\bunknowns\x18\x03 \x03(\tR\bunknowns\x12)\n" +
-	"\x10disable_inlining\x18\x04 \x03(\tR\x0fdisableInlining\x12A\n" +
-	"\aoptions\x18\x05 \x01(\v2\".aserto.authorizer.v2.QueryOptionsH\x00R\aoptions\x88\x01\x01\x12S\n" +
-	"\x0epolicy_context\x18\x06 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextH\x01R\rpolicyContext\x88\x01\x01\x12Y\n" +
-	"\x10identity_context\x18\a \x01(\v2).aserto.authorizer.v2.api.IdentityContextH\x02R\x0fidentityContext\x88\x01\x01\x12G\n" +
-	"\x10resource_context\x18\b \x01(\v2\x17.google.protobuf.StructH\x03R\x0fresourceContext\x88\x01\x01\x12Z\n" +
-	"\x0fpolicy_instance\x18\t \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x02\x18\x01H\x04R\x0epolicyInstance\x88\x01\x01B\n" +
+	"instrument\x18\x02 \x01(\bB\x06\xe2A\x01\x01\x18\x00R\n" +
+	"instrument\x12>\n" +
+	"\x05trace\x18\x03 \x01(\x0e2 .aserto.authorizer.v2.TraceLevelB\x06\xe2A\x01\x01\x18\x00R\x05trace\x12,\n" +
+	"\rtrace_summary\x18\x04 \x01(\bB\x06\xe2A\x01\x01\x18\x00R\rtrace_summary\"\xe7\x04\n" +
+	"\fQueryRequest\x12\x1c\n" +
+	"\x05query\x18\x01 \x01(\tB\x06\xe2A\x01\x02\x18\x00R\x05query\x12\x1c\n" +
+	"\x05input\x18\x02 \x01(\tB\x06\xe2A\x01\x01\x18\x00R\x05input\x12I\n" +
+	"\aoptions\x18\x03 \x01(\v2\".aserto.authorizer.v2.QueryOptionsB\x06\xe2A\x01\x01\x18\x00H\x00R\aoptions\x88\x01\x01\x12\\\n" +
+	"\x0epolicy_context\x18\x04 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextB\x06\xe2A\x01\x01\x18\x00H\x01R\x0epolicy_context\x88\x01\x01\x12b\n" +
+	"\x10identity_context\x18\x05 \x01(\v2).aserto.authorizer.v2.api.IdentityContextB\x06\xe2A\x01\x01\x18\x00H\x02R\x10identity_context\x88\x01\x01\x12P\n" +
+	"\x10resource_context\x18\x06 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x01\x18\x00H\x03R\x10resource_context\x88\x01\x01\x12_\n" +
+	"\x0fpolicy_instance\x18\a \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x04R\x0fpolicy_instance\x88\x01\x01B\n" +
 	"\n" +
 	"\b_optionsB\x11\n" +
 	"\x0f_policy_contextB\x13\n" +
 	"\x11_identity_contextB\x13\n" +
 	"\x11_resource_contextB\x12\n" +
-	"\x10_policy_instance\"\xc9\x01\n" +
-	"\x0fCompileResponse\x12/\n" +
-	"\x06result\x18\x01 \x01(\v2\x17.google.protobuf.StructR\x06result\x121\n" +
-	"\ametrics\x18\x02 \x01(\v2\x17.google.protobuf.StructR\ametrics\x12-\n" +
-	"\x05trace\x18\x03 \x03(\v2\x17.google.protobuf.StructR\x05trace\x12#\n" +
-	"\rtrace_summary\x18\x04 \x03(\tR\ftraceSummary\"\xcb\x01\n" +
-	"\rQueryResponse\x123\n" +
-	"\bresponse\x18\x01 \x01(\v2\x17.google.protobuf.StructR\bresponse\x121\n" +
-	"\ametrics\x18\x02 \x01(\v2\x17.google.protobuf.StructR\ametrics\x12-\n" +
-	"\x05trace\x18\x03 \x03(\v2\x17.google.protobuf.StructR\x05trace\x12#\n" +
-	"\rtrace_summary\x18\x04 \x03(\tR\ftraceSummary*]\n" +
+	"\x10_policy_instance\"\xec\x01\n" +
+	"\rQueryResponse\x12;\n" +
+	"\bresponse\x18\x01 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\bresponse\x129\n" +
+	"\ametrics\x18\x02 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\ametrics\x125\n" +
+	"\x05trace\x18\x03 \x03(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\x05trace\x12,\n" +
+	"\rtrace_summary\x18\x04 \x03(\tB\x06\xe2A\x01\x03\x18\x00R\rtrace_summary\"\xc1\x05\n" +
+	"\x0eCompileRequest\x12\x1c\n" +
+	"\x05query\x18\x01 \x01(\tB\x06\xe2A\x01\x02\x18\x00R\x05query\x12\x1c\n" +
+	"\x05input\x18\x02 \x01(\tB\x06\xe2A\x01\x01\x18\x00R\x05input\x12\"\n" +
+	"\bunknowns\x18\x03 \x03(\tB\x06\xe2A\x01\x01\x18\x00R\bunknowns\x122\n" +
+	"\x10disable_inlining\x18\x04 \x03(\tB\x06\xe2A\x01\x01\x18\x00R\x10disable_inlining\x12I\n" +
+	"\aoptions\x18\x05 \x01(\v2\".aserto.authorizer.v2.QueryOptionsB\x06\xe2A\x01\x01\x18\x00H\x00R\aoptions\x88\x01\x01\x12\\\n" +
+	"\x0epolicy_context\x18\x06 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextB\x06\xe2A\x01\x01\x18\x00H\x01R\x0epolicy_context\x88\x01\x01\x12b\n" +
+	"\x10identity_context\x18\a \x01(\v2).aserto.authorizer.v2.api.IdentityContextB\x06\xe2A\x01\x01\x18\x00H\x02R\x10identity_context\x88\x01\x01\x12P\n" +
+	"\x10resource_context\x18\b \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x01\x18\x00H\x03R\x10resource_context\x88\x01\x01\x12_\n" +
+	"\x0fpolicy_instance\x18\t \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x04R\x0fpolicy_instance\x88\x01\x01B\n" +
+	"\n" +
+	"\b_optionsB\x11\n" +
+	"\x0f_policy_contextB\x13\n" +
+	"\x11_identity_contextB\x13\n" +
+	"\x11_resource_contextB\x12\n" +
+	"\x10_policy_instance\"\xea\x01\n" +
+	"\x0fCompileResponse\x127\n" +
+	"\x06result\x18\x01 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\x06result\x129\n" +
+	"\ametrics\x18\x02 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\ametrics\x125\n" +
+	"\x05trace\x18\x03 \x03(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\x05trace\x12,\n" +
+	"\rtrace_summary\x18\x04 \x03(\tB\x06\xe2A\x01\x03\x18\x00R\rtrace_summary*]\n" +
 	"\rPathSeparator\x12\x1a\n" +
 	"\x16PATH_SEPARATOR_UNKNOWN\x10\x00\x12\x16\n" +
 	"\x12PATH_SEPARATOR_DOT\x10\x01\x12\x18\n" +
@@ -1302,48 +1344,52 @@ const file_aserto_authorizer_v2_authorizer_proto_rawDesc = "" +
 	"\x0fTRACE_LEVEL_OFF\x10\x01\x12\x14\n" +
 	"\x10TRACE_LEVEL_FULL\x10\x02\x12\x15\n" +
 	"\x11TRACE_LEVEL_NOTES\x10\x03\x12\x15\n" +
-	"\x11TRACE_LEVEL_FAILS\x10\x042\x99\r\n" +
+	"\x11TRACE_LEVEL_FAILS\x10\x042\xc9\f\n" +
 	"\n" +
-	"Authorizer\x12\x91\x02\n" +
-	"\fDecisionTree\x12).aserto.authorizer.v2.DecisionTreeRequest\x1a*.aserto.authorizer.v2.DecisionTreeResponse\"\xa9\x01\x92A\x80\x01\n" +
+	"Authorizer\x12\x8b\x02\n" +
+	"\fDecisionTree\x12).aserto.authorizer.v2.DecisionTreeRequest\x1a*.aserto.authorizer.v2.DecisionTreeResponse\"\xa3\x01\xfaPx\n" +
 	"\n" +
-	"Authorizer\x12\rDecision tree\x1a1Returns decision tree for given identity context.*\x18authorizer.decision_treeb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v2/authz/decisiontree\x12\x8f\x02\n" +
-	"\x02Is\x12\x1f.aserto.authorizer.v2.IsRequest\x1a .aserto.authorizer.v2.IsResponse\"\xc5\x01\x92A\xa6\x01\n" +
+	"authorizer\n" +
+	"\fdecisiontree\x12\rDecision tree\x1a1Returns decision tree for given identity context.*\x18authorizer.decision_tree0\x01\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v2/authz/decisiontree\x88\x02\x01\x12\xfe\x01\n" +
+	"\x02Is\x12\x1f.aserto.authorizer.v2.IsRequest\x1a .aserto.authorizer.v2.IsResponse\"\xb4\x01\xfaP\x92\x01\n" +
 	"\n" +
-	"Authorizer\x12\x0fIs (authorized)\x1a`Determines if identity context is authorized to access the resource guarded by the given policy.*\rauthorizer.isb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/api/v2/authz/is\x12\xe6\x01\n" +
-	"\x05Query\x12\".aserto.authorizer.v2.QueryRequest\x1a#.aserto.authorizer.v2.QueryResponse\"\x93\x01\x92Ar\n" +
+	"authorizer\n" +
+	"\x02is\x12\x0fIs (authorized)\x1a`Determines if identity context is authorized to access the resource guarded by the given policy.*\rauthorizer.is\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/api/v2/authz/is\x88\x02\x00\x12\xd8\x01\n" +
+	"\x05Query\x12\".aserto.authorizer.v2.QueryRequest\x1a#.aserto.authorizer.v2.QueryResponse\"\x85\x01\xfaPa\n" +
 	"\n" +
-	"Authorizer\x12\x05Query\x1a3Executes a rego query on the loaded policy runtime.*\x10authorizer.queryb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v2/authz/query\x12\xf5\x01\n" +
-	"\aCompile\x12$.aserto.authorizer.v2.CompileRequest\x1a%.aserto.authorizer.v2.CompileResponse\"\x9c\x01\x92Ay\n" +
+	"authorizer\n" +
+	"\x05query\x12\x05Query\x1a3Executes a rego query on the loaded policy runtime.*\x10authorizer.query\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v2/authz/query\x88\x02\x00\x12\xe9\x01\n" +
+	"\aCompile\x12$.aserto.authorizer.v2.CompileRequest\x1a%.aserto.authorizer.v2.CompileResponse\"\x90\x01\xfaPj\n" +
 	"\n" +
-	"Authorizer\x12\aCompile\x1a6Executes a partial query on the loaded policy runtime.*\x12authorizer.compileb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v2/authz/compile\x12\xf2\x01\n" +
-	"\fListPolicies\x12).aserto.authorizer.v2.ListPoliciesRequest\x1a*.aserto.authorizer.v2.ListPoliciesResponse\"\x8a\x01\x92Ao\n" +
-	"\x06Policy\x12\rList Policies\x1a/Lists the policy modules for the policy bundle.*\rpolicies.listb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v2/policies\x12\xf0\x01\n" +
-	"\tGetPolicy\x12&.aserto.authorizer.v2.GetPolicyRequest\x1a'.aserto.authorizer.v2.GetPolicyResponse\"\x91\x01\x92Al\n" +
-	"\x06Policy\x12\n" +
-	"Get Policy\x1a0Gets the policy modules for the given module Id.*\fpolicies.getb\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v2/policies/{id=*/**}\x12\x9b\x01\n" +
-	"\x04Info\x12!.aserto.authorizer.v2.InfoRequest\x1a\".aserto.authorizer.v2.InfoResponse\"L\x92A5\n" +
-	"\x04Info\x12\x04Info\x1a\x1bReturn version information.*\binfo.getb\x00\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v2/infoB\xf1\x03\x92A\x91\x03\x12\xbf\x01\n" +
-	"\x12Authorizer Service\"O\n" +
-	"\fAserto, Inc.\x12+https://github.com/aserto-dev/pb-authorizer\x1a\x12support@aserto.com*S\n" +
-	"\x12Apache 2.0 License\x12=https://github.com/aserto-dev/pb-authorizer/blob/main/LICENSE2\x032.1*\x02\x01\x022\x10application/json:\x10application/jsonZ)\n" +
-	"'\n" +
-	"\x10AuthorizerAPIKey\x12\x13\b\x02\x1a\rauthorization \x02b\x16\n" +
-	"\x14\n" +
-	"\x10AuthorizerAPIKey\x12\x00rb\n" +
-	"\x19Authorizer API Reference.\x12Ehttps://github.com/aserto-dev/pb-authorizer/blob/main/html/index.htmlZCgithub.com/aserto-dev/go-authorizer/aserto/authorizer/v2;authorizer\xaa\x02\x14Aserto.Authorizer.V2b\x06proto3"
+	"authorizer\n" +
+	"\acompile\x12\aCompile\x1a6Executes a partial query on the loaded policy runtime.*\x12authorizer.compile\x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v2/authz/compile\x88\x02\x00\x12\xe2\x01\n" +
+	"\fListPolicies\x12).aserto.authorizer.v2.ListPoliciesRequest\x1a*.aserto.authorizer.v2.ListPoliciesResponse\"{\xfaP]\n" +
+	"\x06policy\n" +
+	"\x04list\x12\rList Policies\x1a/Lists the policy modules for the policy bundle.*\rpolicies.list\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v2/policies\x88\x02\x00\x12\xe0\x01\n" +
+	"\tGetPolicy\x12&.aserto.authorizer.v2.GetPolicyRequest\x1a'.aserto.authorizer.v2.GetPolicyResponse\"\x81\x01\xfaPY\n" +
+	"\x06policy\n" +
+	"\x03get\x12\n" +
+	"Get Policy\x1a0Gets the policy modules for the given module Id.*\fpolicies.get\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v2/policies/{id=*/**}\x88\x02\x00\x12\x9c\x01\n" +
+	"\x04Info\x12!.aserto.authorizer.v2.InfoRequest\x1a\".aserto.authorizer.v2.InfoResponse\"M\xfaP3\n" +
+	"\x04info\x12\x04Info\x1a\x1bReturn version information.*\binfo.get\x82\xd3\xe4\x93\x02\x0e\x12\f/api/v2/info\x88\x02\x00B\xbb\x04\xfaP\xdb\x03\n" +
+	"\xd4\x01\n" +
+	"\x18Topaz Authorizer Service*^\n" +
+	"\x1bTopaz Authorization Project\x12+https://github.com/aserto-dev/go-authorizer\x1a\x12support@aserto.com2S\n" +
+	"\x12Apache 2.0 License\x1a=https://github.com/aserto-dev/go-authorizer/blob/main/LICENSE:\x033.1\x123\n" +
+	"\x17{{.Scheme}}://{{.Host}}\x12\x18Topaz Authorizer service\x1ah\n" +
+	"\x1fTopaz Authorizer API Reference.\x12Ehttps://github.com/aserto-dev/go-authorizer/blob/main/html/index.html\"\f\n" +
+	"\n" +
+	"authorizer\"\b\n" +
+	"\x06policy\"\n" +
+	"\n" +
+	"\bpolicies\"\x05\n" +
+	"\x03get\"\x06\n" +
+	"\x04list\"\x04\n" +
+	"\x02is\"\a\n" +
+	"\x05query\"\t\n" +
+	"\acompile\"\x0e\n" +
+	"\fdecisiontree\"\x06\n" +
+	"\x04infoZCgithub.com/aserto-dev/go-authorizer/aserto/authorizer/v2;authorizer\xaa\x02\x14Aserto.Authorizer.V2b\x06proto3"
 
 var (
 	file_aserto_authorizer_v2_authorizer_proto_rawDescOnce sync.Once
@@ -1376,9 +1422,9 @@ var file_aserto_authorizer_v2_authorizer_proto_goTypes = []any{
 	(*IsResponse)(nil),            // 13: aserto.authorizer.v2.IsResponse
 	(*QueryOptions)(nil),          // 14: aserto.authorizer.v2.QueryOptions
 	(*QueryRequest)(nil),          // 15: aserto.authorizer.v2.QueryRequest
-	(*CompileRequest)(nil),        // 16: aserto.authorizer.v2.CompileRequest
-	(*CompileResponse)(nil),       // 17: aserto.authorizer.v2.CompileResponse
-	(*QueryResponse)(nil),         // 18: aserto.authorizer.v2.QueryResponse
+	(*QueryResponse)(nil),         // 16: aserto.authorizer.v2.QueryResponse
+	(*CompileRequest)(nil),        // 17: aserto.authorizer.v2.CompileRequest
+	(*CompileResponse)(nil),       // 18: aserto.authorizer.v2.CompileResponse
 	(*fieldmaskpb.FieldMask)(nil), // 19: google.protobuf.FieldMask
 	(*api.PolicyInstance)(nil),    // 20: aserto.authorizer.v2.api.PolicyInstance
 	(*api.Module)(nil),            // 21: aserto.authorizer.v2.api.Module
@@ -1411,28 +1457,28 @@ var file_aserto_authorizer_v2_authorizer_proto_depIdxs = []int32{
 	23, // 21: aserto.authorizer.v2.QueryRequest.identity_context:type_name -> aserto.authorizer.v2.api.IdentityContext
 	24, // 22: aserto.authorizer.v2.QueryRequest.resource_context:type_name -> google.protobuf.Struct
 	20, // 23: aserto.authorizer.v2.QueryRequest.policy_instance:type_name -> aserto.authorizer.v2.api.PolicyInstance
-	14, // 24: aserto.authorizer.v2.CompileRequest.options:type_name -> aserto.authorizer.v2.QueryOptions
-	22, // 25: aserto.authorizer.v2.CompileRequest.policy_context:type_name -> aserto.authorizer.v2.api.PolicyContext
-	23, // 26: aserto.authorizer.v2.CompileRequest.identity_context:type_name -> aserto.authorizer.v2.api.IdentityContext
-	24, // 27: aserto.authorizer.v2.CompileRequest.resource_context:type_name -> google.protobuf.Struct
-	20, // 28: aserto.authorizer.v2.CompileRequest.policy_instance:type_name -> aserto.authorizer.v2.api.PolicyInstance
-	24, // 29: aserto.authorizer.v2.CompileResponse.result:type_name -> google.protobuf.Struct
-	24, // 30: aserto.authorizer.v2.CompileResponse.metrics:type_name -> google.protobuf.Struct
-	24, // 31: aserto.authorizer.v2.CompileResponse.trace:type_name -> google.protobuf.Struct
-	24, // 32: aserto.authorizer.v2.QueryResponse.response:type_name -> google.protobuf.Struct
-	24, // 33: aserto.authorizer.v2.QueryResponse.metrics:type_name -> google.protobuf.Struct
-	24, // 34: aserto.authorizer.v2.QueryResponse.trace:type_name -> google.protobuf.Struct
+	24, // 24: aserto.authorizer.v2.QueryResponse.response:type_name -> google.protobuf.Struct
+	24, // 25: aserto.authorizer.v2.QueryResponse.metrics:type_name -> google.protobuf.Struct
+	24, // 26: aserto.authorizer.v2.QueryResponse.trace:type_name -> google.protobuf.Struct
+	14, // 27: aserto.authorizer.v2.CompileRequest.options:type_name -> aserto.authorizer.v2.QueryOptions
+	22, // 28: aserto.authorizer.v2.CompileRequest.policy_context:type_name -> aserto.authorizer.v2.api.PolicyContext
+	23, // 29: aserto.authorizer.v2.CompileRequest.identity_context:type_name -> aserto.authorizer.v2.api.IdentityContext
+	24, // 30: aserto.authorizer.v2.CompileRequest.resource_context:type_name -> google.protobuf.Struct
+	20, // 31: aserto.authorizer.v2.CompileRequest.policy_instance:type_name -> aserto.authorizer.v2.api.PolicyInstance
+	24, // 32: aserto.authorizer.v2.CompileResponse.result:type_name -> google.protobuf.Struct
+	24, // 33: aserto.authorizer.v2.CompileResponse.metrics:type_name -> google.protobuf.Struct
+	24, // 34: aserto.authorizer.v2.CompileResponse.trace:type_name -> google.protobuf.Struct
 	8,  // 35: aserto.authorizer.v2.Authorizer.DecisionTree:input_type -> aserto.authorizer.v2.DecisionTreeRequest
 	11, // 36: aserto.authorizer.v2.Authorizer.Is:input_type -> aserto.authorizer.v2.IsRequest
 	15, // 37: aserto.authorizer.v2.Authorizer.Query:input_type -> aserto.authorizer.v2.QueryRequest
-	16, // 38: aserto.authorizer.v2.Authorizer.Compile:input_type -> aserto.authorizer.v2.CompileRequest
+	17, // 38: aserto.authorizer.v2.Authorizer.Compile:input_type -> aserto.authorizer.v2.CompileRequest
 	6,  // 39: aserto.authorizer.v2.Authorizer.ListPolicies:input_type -> aserto.authorizer.v2.ListPoliciesRequest
 	4,  // 40: aserto.authorizer.v2.Authorizer.GetPolicy:input_type -> aserto.authorizer.v2.GetPolicyRequest
 	2,  // 41: aserto.authorizer.v2.Authorizer.Info:input_type -> aserto.authorizer.v2.InfoRequest
 	10, // 42: aserto.authorizer.v2.Authorizer.DecisionTree:output_type -> aserto.authorizer.v2.DecisionTreeResponse
 	13, // 43: aserto.authorizer.v2.Authorizer.Is:output_type -> aserto.authorizer.v2.IsResponse
-	18, // 44: aserto.authorizer.v2.Authorizer.Query:output_type -> aserto.authorizer.v2.QueryResponse
-	17, // 45: aserto.authorizer.v2.Authorizer.Compile:output_type -> aserto.authorizer.v2.CompileResponse
+	16, // 44: aserto.authorizer.v2.Authorizer.Query:output_type -> aserto.authorizer.v2.QueryResponse
+	18, // 45: aserto.authorizer.v2.Authorizer.Compile:output_type -> aserto.authorizer.v2.CompileResponse
 	7,  // 46: aserto.authorizer.v2.Authorizer.ListPolicies:output_type -> aserto.authorizer.v2.ListPoliciesResponse
 	5,  // 47: aserto.authorizer.v2.Authorizer.GetPolicy:output_type -> aserto.authorizer.v2.GetPolicyResponse
 	3,  // 48: aserto.authorizer.v2.Authorizer.Info:output_type -> aserto.authorizer.v2.InfoResponse
@@ -1453,7 +1499,7 @@ func file_aserto_authorizer_v2_authorizer_proto_init() {
 	file_aserto_authorizer_v2_authorizer_proto_msgTypes[6].OneofWrappers = []any{}
 	file_aserto_authorizer_v2_authorizer_proto_msgTypes[9].OneofWrappers = []any{}
 	file_aserto_authorizer_v2_authorizer_proto_msgTypes[13].OneofWrappers = []any{}
-	file_aserto_authorizer_v2_authorizer_proto_msgTypes[14].OneofWrappers = []any{}
+	file_aserto_authorizer_v2_authorizer_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
