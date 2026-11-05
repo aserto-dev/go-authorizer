@@ -14,25 +14,35 @@ EXT_DIR            := ${PWD}/.ext
 EXT_BIN_DIR        := ${EXT_DIR}/bin
 EXT_TMP_DIR        := ${EXT_DIR}/tmp
 
-GO_VER             := 1.26
-SVU_VER            := 3.4.1
+TMP_DIR            := ${PWD}/.tmp
+TMP_BUF_DIR        := ${TMP_DIR}/buf
+TMP_OAI_DIR        := ${TMP_DIR}/openapi
+
+GO_VER             := 1.27
+SVU_VER            := 3.4.4
 GOTESTSUM_VER      := 1.13.0
-GOLANGCI-LINT_VER  := 2.13.1
-GORELEASER_VER     := 2.17.1
-BUF_VER            := 1.72.0
+GOLANGCI-LINT_VER  := 2.15.0
+GORELEASER_VER     := 2.20.0
+BUF_VER            := 1.75.0
+MERGE-JSON_VER     := 0.2.0
+GOFUMPT_VER        := latest
 
 PROJECT            := authorizer
-PROTO_REPO         := pb-${PROJECT}
+PROTO_REPO         := go-${PROJECT}
 BUF_REPO           := buf.build/aserto-dev/${PROJECT}
 BUF_LATEST         := $(shell ${EXT_BIN_DIR}/buf registry module label list ${BUF_REPO} --format json | jq -r '.labels[0].name')
-BUF_DEV_IMAGE      := ../${PROTO_REPO$}/bin/${PROJECT}.bin
+BUF_DEV_IMAGE      := ${TMP_BUF_DIR}/${PROJECT}.bin
 
 RELEASE_TAG        := $$(${EXT_BIN_DIR}/svu current)
 
-.DEFAULT_GOAL      := lint
+.DEFAULT_GOAL      := build
+
+.PHONY: build
+build: gover buf-build buf-lint buf-generate-dev go-mod-tidy lint test
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 
 .PHONY: deps
-deps: info install-buf install-svu install-golangci-lint install-gotestsum
+deps: info install-buf install-svu install-golangci-lint install-gotestsum install-merge-json install-gofumpt
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 
 .PHONY: gover
@@ -40,37 +50,133 @@ gover:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@(go env GOVERSION | grep "go${GO_VER}") || (echo "go version check failed expected go${GO_VER} got $$(go env GOVERSION)"; exit 1)
 
+PHONY: go-fmt
+go-fmt: 
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/gofumpt -l -w .
+
+PHONY: go-mod-tidy
+go-mod-tidy: go-fmt go-work-sync
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@exit_code=0; \
+	modules=$$(go work edit -json | jq -r '.Use[].DiskPath // empty'); \
+	for mod in $$modules; do \
+		if [ "$$mod" = "." ]; then \
+			mod_dir=$$(pwd); \
+		else \
+			mod_dir=$$(realpath "$$mod" 2>/dev/null || echo "$$mod"); \
+		fi; \
+		echo -e "$(ATTN_COLOR)==> $@ $$mod_dir$(NO_COLOR)"; \
+		(cd "$$mod_dir" && go mod tidy) || exit_code=$$?; \
+	done; \
+	exit $$exit_code
+
+PHONY: go-work-sync
+go-work-sync:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@go work sync
+
 .PHONY: lint
 lint: gover
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@${EXT_BIN_DIR}/golangci-lint config path
 	@${EXT_BIN_DIR}/golangci-lint config verify
-	@${EXT_BIN_DIR}/golangci-lint run --timeout=30m
+	@exit_code=0; \
+	config=${PWD}/.golangci.yaml; \
+	modules=$$(go work edit -json | jq -r '.Use[].DiskPath // empty'); \
+	for mod in $$modules; do \
+		if [ "$$mod" = "." ]; then \
+			mod_dir=$$(pwd); \
+		else \
+			mod_dir=$$(realpath "$$mod" 2>/dev/null || echo "$$mod"); \
+		fi; \
+		echo -e "$(ATTN_COLOR)==> $@ $$mod_dir$(NO_COLOR)"; \
+		(cd "$$mod_dir" && ${EXT_BIN_DIR}/golangci-lint run --config $$config ./...) || exit_code=$$?; \
+	done; \
+	exit $$exit_code
 
-PHONY: test
+.PHONY: lint-clean
+lint-clean: gover
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/golangci-lint cache clean
+
+.PHONY: test
 test: gover
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@${EXT_BIN_DIR}/gotestsum --format short-verbose -- -count=1 -v ${PWD}/... -coverprofile=cover.out -coverpkg=./... ${PWD}/...
+	@exit_code=0; \
+	modules=$$(go work edit -json | jq -r '.Use[].DiskPath // empty'); \
+	for mod in $$modules; do \
+		if [ "$$mod" = "." ]; then \
+			mod_dir=$$(pwd); \
+		else \
+			mod_dir=$$(realpath "$$mod" 2>/dev/null || echo "$$mod"); \
+		fi; \
+		echo -e "$(ATTN_COLOR)==> $@ $$mod_dir$(NO_COLOR)"; \
+		(cd "$$mod_dir" && ${EXT_BIN_DIR}/gotestsum --format short-verbose -- -count=1 -v ./... -coverprofile=cover.out -coverpkg=./... ./...) || exit_code=$$?; \
+	done; \
+	exit $$exit_code
 
 .PHONY: buf-login
 buf-login:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@${EXT_BIN_DIR}/buf registry login
+	@echo ${BUF_TOKEN} | ${EXT_BIN_DIR}/buf registry login --token-stdin
+
+.PHONY: buf-dep-update
+buf-dep-update:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf dep update
+
+.PHONY: buf-format
+buf-format:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf format -w proto
+
+.PHONY: buf-build
+buf-build: ${TMP_BUF_DIR} buf-format 
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf build --output ${BUF_DEV_IMAGE}
+
+.PHONY: buf-lint
+buf-lint:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf lint
+
+.PHONY: buf-breaking
+buf-breaking:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf breaking --against "github.com/aserto-dev/pb-authorizer.git#branch=main"
+
+.PHONY: buf-push
+buf-push:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@${EXT_BIN_DIR}/buf push --label ${RELEASE_TAG}
 
 .PHONY: buf-generate
-buf-generate: buf-generate-clean
+buf-generate: buf-clean generate merge-json
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+
+.PHONY: buf-generate-dev
+buf-generate-dev: ${BUF_DEV_IMAGE} buf-clean generate-dev merge-json
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+
+generate:
 	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_REPO}:${BUF_LATEST}$(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf generate ${BUF_REPO}:${BUF_LATEST}
 
-.PHONY: buf-generate-dev
-buf-generate-dev: ${BUF_DEV_IMAGE} buf-generate-clean
+generate-dev: ${TMP_BUF_DIR}
 	@echo -e "$(ATTN_COLOR)==> $@ ${BUF_DEV_IMAGE}$(NO_COLOR)"
 	@${EXT_BIN_DIR}/buf generate ${BUF_DEV_IMAGE}
 
-.PHONY: buf-generate-clean
-buf-generate-clean: ./aserto
+.PHONY: merge-json
+merge-json:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@rm -rf ./aserto
+	@${EXT_BIN_DIR}/merge-json -output ./openapi/authorizer.openapi.json \
+	.tmp/openapi/aserto/authorizer/v2/authorizer.openapi.json
+
+.PHONY: buf-clean
+buf-clean:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@rm -rf ./aserto/authorizer
 
 .PHONY: info
 info:
@@ -81,16 +187,18 @@ info:
 	@echo "GOARCH:        ${GOARCH}"
 	@echo "EXT_BIN_DIR:   ${EXT_BIN_DIR}"
 	@echo "EXT_TMP_DIR:   ${EXT_TMP_DIR}"
-	@echo "RELEASE_TAG:   ${RELEASE_TAG}"
+	@echo "EXT_BIN_DIR:   ${EXT_BIN_DIR}"
+	@echo "TMP_BUF_DIR:   ${TMP_BUF_DIR}"
+	@echo "TMP_OAI_DIR:   ${TMP_OAI_DIR}"
 	@echo "BUF_REPO:      ${BUF_REPO}"
 	@echo "BUF_LATEST:    ${BUF_LATEST}"
 	@echo "BUF_DEV_IMAGE: ${BUF_DEV_IMAGE}"
+	@echo "RELEASE_TAG:   ${RELEASE_TAG}"
 	
 .PHONY: install-buf
 install-buf: ${EXT_BIN_DIR}
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@gh release download v${BUF_VER} --repo https://github.com/bufbuild/buf --pattern "buf-$$(uname -s)-$$(uname -m)" --output "${EXT_BIN_DIR}/buf" --clobber
-	@chmod +x ${EXT_BIN_DIR}/buf
+	GOBIN=${EXT_BIN_DIR} go install github.com/bufbuild/buf/cmd/buf@v${BUF_VER}
 	@${EXT_BIN_DIR}/buf --version
 
 .PHONY: install-svu
@@ -124,16 +232,21 @@ install-goreleaser: ${EXT_TMP_DIR} ${EXT_BIN_DIR}
 	@chmod +x ${EXT_BIN_DIR}/goreleaser
 	@${EXT_BIN_DIR}/goreleaser --version
 
+.PHONY: install-gofumpt
+install-gofumpt: ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@GOBIN=${EXT_BIN_DIR} go install mvdan.cc/gofumpt@${GOFUMPT_VER}
+
+.PHONY: install-merge-json
+install-merge-json: ${EXT_BIN_DIR}
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@GOBIN=${EXT_BIN_DIR} go install github.com/topaz-io/merge-json@v${MERGE-JSON_VER}
+
 .PHONY: clean
 clean:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@rm -rf ${EXT_DIR}
-	@rm -rf ${BIN_DIR}
-	@rm -rf ./aserto
-
-${BIN_DIR}:
-	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
-	@mkdir -p ${BIN_DIR}
+	@rm -rf ${TMP_DIR}
 
 ${EXT_BIN_DIR}:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
@@ -142,3 +255,11 @@ ${EXT_BIN_DIR}:
 ${EXT_TMP_DIR}:
 	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
 	@mkdir -p ${EXT_TMP_DIR}
+
+${TMP_BUF_DIR}:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@mkdir -p ${TMP_BUF_DIR}
+
+${TMP_OAI_DIR}:
+	@echo -e "$(ATTN_COLOR)==> $@ $(NO_COLOR)"
+	@mkdir -p ${TMP_OAI_DIR}

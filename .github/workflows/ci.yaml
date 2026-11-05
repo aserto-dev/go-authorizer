@@ -4,9 +4,6 @@ name: ci
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      proto_ref:
-      proto_sha:
   push:
     branches:
       - main
@@ -17,20 +14,11 @@ on:
   pull_request:
 
 env:
-  BUF_REPO: "buf.build/aserto-dev/authorizer"
-  BUF_VER: 1.72.0
-  GO_LANGCI_LINT_VER: "v2.13.1"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        uses: actions/create-github-app-token@v3
-        id: app-token
-        with:
-          client-id: ${{ vars.CODEGEN_APP_ID }}
-          private-key: ${{ secrets.CODEGEN_APP_KEY }}
       -
         name: Checkout
         uses: actions/checkout@v7
@@ -44,43 +32,22 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
       -
-        name: Test Setup
+        name: Setup Lint
+        run: |
+          make install-golangci-lint
+      -
+        name: Setup Test
         run: |
           make install-gotestsum
       -
-        name: Setup buf
-        uses: bufbuild/buf-action@v1
-        with:
-          version: ${{ env.BUF_VER }}
-          setup_only: true
+      	name: Run go mod tidy
+	run: |
+	  make go-mod-tidy
       -
-        name: Delete generated code
-        run: |
-          rm -rf ./aserto
+      	name: Run Lint
+	run: |
+	  make lint
       -
-        name: Get latest version tag from Buf Registry
-        id: buf-latest
-        run: |
-          echo "VERSION=$(buf registry module label list ${BUF_REPO} --format json | jq -r '.labels[0].name')" >> "$GITHUB_OUTPUT"
-      -
-        name: Buf Generate
-        run: |
-          echo "${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}"
-          buf generate ${{ env.BUF_REPO }}:${{ steps.buf-latest.outputs.VERSION }}
-      -
-        name: Lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: ${{ env.GO_LANGCI_LINT_VER }}
-          args: --timeout=5m
-      -
-        name: Test
-        run: |
-          .ext/bin/gotestsum --format short-verbose -- -count=1 -parallel=1 -v -timeout=240s -coverprofile=cover.out -coverpkg=./... ./...
-      -
-        name: Commit changes
-        if: github.event_name == 'workflow_dispatch'
-        uses: EndBug/add-and-commit@v11
-        with:
-          default_author: github_actions
-          add: 'aserto'
+      	name: Run Test
+	run: |
+	  make test

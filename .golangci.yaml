@@ -12,10 +12,11 @@ linters:
   disable:
     - depguard
     - exhaustruct
-    - gomodguard # is deprecated (since v2.12.0) due to: new major version.
     - gochecknoglobals  # no configuration options
+    - gomoddirectives # required to use local replace from aserto to pkg
+    - gomodguard # is deprecated (since v2.12.0) due to: new major version.
     - nlreturn  # redundant with wsl
-    - noinlineerr 
+    - noinlineerr
     - paralleltest
     - revive
     - thelper
@@ -33,6 +34,10 @@ linters:
         - fmt.Fprintf
         - fmt.Fprintln
         - os.Close
+    exhaustruct_v5:
+      ignore-patterns:
+        - '.*/protojson\.MarshalOptions$'
+        - '.*/protojson\.UnmarshalOptions$'
 
     funlen:
       lines: 80
@@ -57,14 +62,17 @@ linters:
           json: snake
           yaml: snake
 
-              
+
     wsl_v5:
       allow-first-in-block: true
       allow-whole-block: false
-      branch-max-lines: 2 
+      branch-max-lines: 2
 
   exclusions:
     generated: lax
+
+    paths:
+      - aserto/authorizer/
 
 formatters:
   enable:
