@@ -40,14 +40,14 @@ jobs:
         run: |
           make install-gotestsum
       -
-      	name: Run go mod tidy
-	run: |
-	  make go-mod-tidy
+        name: Run go mod tidy
+        run: |
+          make go-mod-tidy
       -
-      	name: Run Lint
-	run: |
-	  make lint
+        name: Run Lint
+        run: |
+          make lint
       -
-      	name: Run Test
-	run: |
-	  make test
+        name: Run Test
+        run: |
+          make test
