@@ -13,8 +13,6 @@ on:
   # Run tests for PRs
   pull_request:
 
-env:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,9 +20,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          token: ${{ steps.app-token.outputs.token }}
       -
         name: Setup Go
         uses: actions/setup-go@v7
