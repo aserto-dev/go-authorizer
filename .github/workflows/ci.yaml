@@ -27,13 +27,9 @@ jobs:
           go-version-file: 'go.work'
           cache: true
       -
-        name: Setup Lint
+        name: Setup
         run: |
-          make install-golangci-lint
-      -
-        name: Setup Test
-        run: |
-          make install-gotestsum
+          make deps
       -
         name: Run go mod tidy
         run: |
