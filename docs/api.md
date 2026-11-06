@@ -339,8 +339,8 @@ Identity types, describes the payload type of the identity field inside the Iden
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| path_root | [string](#string) |  |  |
-| path | [google.protobuf.Struct](#google-protobuf-Struct) |  |  |
+| path_root | [string](#string) |  | path root |
+| path | [google.protobuf.Struct](#google-protobuf-Struct) |  | path |
 
 
 
