@@ -294,14 +294,28 @@ enum PathSeparator {
 message DecisionTreeOptions {
   reserved 2; // removed "grouping"
 
-  PathSeparator path_separator = 1;
+  PathSeparator path_separator = 1 [
+    json_name = "path_separator",
+    (google.api.field_behavior) = OPTIONAL,
+    deprecated = false
+  ];
 }
 
 message DecisionTreeResponse {
   reserved 2; // removed "revision"
 
-  string path_root = 1;
-  google.protobuf.Struct path = 3;
+  // path root
+  string path_root = 1 [
+    json_name = "path_root",
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    deprecated = false
+  ];
+  // path
+  google.protobuf.Struct path = 3 [
+    json_name = "path",
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    deprecated = false
+  ];
 }
 
 message IsRequest {

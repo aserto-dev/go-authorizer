@@ -532,7 +532,7 @@ func (x *DecisionTreeRequest) GetPolicyInstance() *api.PolicyInstance {
 
 type DecisionTreeOptions struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PathSeparator PathSeparator          `protobuf:"varint,1,opt,name=path_separator,json=pathSeparator,proto3,enum=aserto.authorizer.v2.PathSeparator" json:"path_separator,omitempty"`
+	PathSeparator PathSeparator          `protobuf:"varint,1,opt,name=path_separator,proto3,enum=aserto.authorizer.v2.PathSeparator" json:"path_separator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -575,9 +575,11 @@ func (x *DecisionTreeOptions) GetPathSeparator() PathSeparator {
 }
 
 type DecisionTreeResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PathRoot      string                 `protobuf:"bytes,1,opt,name=path_root,json=pathRoot,proto3" json:"path_root,omitempty"`
-	Path          *structpb.Struct       `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// path root
+	PathRoot string `protobuf:"bytes,1,opt,name=path_root,proto3" json:"path_root,omitempty"`
+	// path
+	Path          *structpb.Struct `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1269,12 +1271,12 @@ const file_aserto_authorizer_v2_authorizer_proto_rawDesc = "" +
 	"\aoptions\x18\x03 \x01(\v2).aserto.authorizer.v2.DecisionTreeOptionsB\x06\xe2A\x01\x01\x18\x00R\aoptions\x12K\n" +
 	"\x10resource_context\x18\x04 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x01\x18\x00R\x10resource_context\x12_\n" +
 	"\x0fpolicy_instance\x18\x05 \x01(\v2(.aserto.authorizer.v2.api.PolicyInstanceB\x06\xe2A\x01\x01\x18\x01H\x00R\x0fpolicy_instance\x88\x01\x01B\x12\n" +
-	"\x10_policy_instance\"g\n" +
-	"\x13DecisionTreeOptions\x12J\n" +
-	"\x0epath_separator\x18\x01 \x01(\x0e2#.aserto.authorizer.v2.PathSeparatorR\rpathSeparatorJ\x04\b\x02\x10\x03\"f\n" +
-	"\x14DecisionTreeResponse\x12\x1b\n" +
-	"\tpath_root\x18\x01 \x01(\tR\bpathRoot\x12+\n" +
-	"\x04path\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x04pathJ\x04\b\x02\x10\x03\"\x85\x03\n" +
+	"\x10_policy_instance\"p\n" +
+	"\x13DecisionTreeOptions\x12S\n" +
+	"\x0epath_separator\x18\x01 \x01(\x0e2#.aserto.authorizer.v2.PathSeparatorB\x06\xe2A\x01\x01\x18\x00R\x0epath_separatorJ\x04\b\x02\x10\x03\"w\n" +
+	"\x14DecisionTreeResponse\x12$\n" +
+	"\tpath_root\x18\x01 \x01(\tB\x06\xe2A\x01\x03\x18\x00R\tpath_root\x123\n" +
+	"\x04path\x18\x03 \x01(\v2\x17.google.protobuf.StructB\x06\xe2A\x01\x03\x18\x00R\x04pathJ\x04\b\x02\x10\x03\"\x85\x03\n" +
 	"\tIsRequest\x12W\n" +
 	"\x0epolicy_context\x18\x01 \x01(\v2'.aserto.authorizer.v2.api.PolicyContextB\x06\xe2A\x01\x02\x18\x00R\x0epolicy_context\x12]\n" +
 	"\x10identity_context\x18\x02 \x01(\v2).aserto.authorizer.v2.api.IdentityContextB\x06\xe2A\x01\x02\x18\x00R\x10identity_context\x12K\n" +

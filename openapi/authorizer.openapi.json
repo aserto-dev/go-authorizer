@@ -557,7 +557,7 @@
       "aserto.authorizer.v2.DecisionTreeOptions": {
         "type": "object",
         "properties": {
-          "pathSeparator": {
+          "path_separator": {
             "$ref": "#/components/schemas/aserto.authorizer.v2.PathSeparator"
           }
         }
@@ -566,10 +566,14 @@
         "type": "object",
         "properties": {
           "path": {
-            "type": "object"
+            "type": "object",
+            "description": "path",
+            "readOnly": true
           },
-          "pathRoot": {
-            "type": "string"
+          "path_root": {
+            "type": "string",
+            "description": "path root",
+            "readOnly": true
           }
         }
       },
